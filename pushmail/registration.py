@@ -85,7 +85,11 @@ class RegistrationService:
     def confirm(self, email: EMail, token: Token):
         registration = self._storage.find(email)
 
-        if registration is None or registration.confirm_token != token:
+        if (
+            registration is None
+            or registration.confirm_action is None
+            or registration.confirm_token != token
+        ):
             raise UnauthorizedException("Invalid token.")
 
         if registration.confirm_action == Action.subscribe:

@@ -346,3 +346,24 @@ class TestRegistrationServiceConfirm:
 
         with pytest.raises(UnauthorizedException):
             registration_service.confirm(given_email, Token(b"invalid token"))
+
+    def test_confirm_for_unknown_email_raises_exception(self, registration_service):
+        given_email = EMail("pending@test.org")
+
+        with pytest.raises(UnauthorizedException):
+            registration_service.confirm(given_email, Token(b"token"))
+
+    def test_confirm_for_registration_without_confirm_action_raises_exception(
+        self, registration_service, storage, utcnow
+    ):
+        given_email = EMail("subscribed@test.org")
+        storage.upsert(
+            Registration(
+                email=given_email,
+                state=State.subscribed,
+                last_update=utcnow() - timedelta(days=1),
+            )
+        )
+
+        with pytest.raises(UnauthorizedException):
+            registration_service.confirm(given_email, None)

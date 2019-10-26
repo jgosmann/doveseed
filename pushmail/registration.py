@@ -31,8 +31,10 @@ class Storage(Protocol):
         ...
 
 
-class Mailer(Protocol):
-    def mail_subscribe_confirm(self, email: EMail, *, confirm_token: Token) -> None:
+class ConfirmationRequester(Protocol):
+    def request_confirmation(
+        self, email: EMail, *, action: Action, confirm_token: Token
+    ) -> None:
         ...
 
 
@@ -41,12 +43,12 @@ class RegistrationService:
         self,
         *,
         storage: Storage,
-        mailer: Mailer,
+        confirmation_requester: ConfirmationRequester,
         token_generator: Iterator[Token],
         utcnow: Callable[[], datetime]
     ):
         self._storage = storage
-        self._mailer = mailer
+        self._confirmation_requester = confirmation_requester
         self._token_generator = token_generator
         self._utcnow = utcnow
 
@@ -65,7 +67,22 @@ class RegistrationService:
             if registration.confirm_token is None:
                 registration.confirm_token = next(self._token_generator)
 
-            self._storage.upsert(registration)
-            self._mailer.mail_subscribe_confirm(
-                email, confirm_token=registration.confirm_token
-            )
+            self._perform_state_change(registration)
+
+    def unsubscribe(self, email: EMail):
+        registration = self._storage.find(email)
+        subscribed_states = (State.subscribed, State.pending_unsubscribe)
+        if registration is not None and registration.state in subscribed_states:
+            registration.state = State.pending_unsubscribe
+            registration.last_update = self._utcnow()
+            registration.confirm_token = next(self._token_generator)
+            registration.confirm_action = Action.unsubscribe
+            self._perform_state_change(registration)
+
+    def _perform_state_change(self, registration):
+        self._storage.upsert(registration)
+        self._confirmation_requester.request_confirmation(
+            registration.email,
+            action=registration.confirm_action,
+            confirm_token=registration.confirm_token,
+        )

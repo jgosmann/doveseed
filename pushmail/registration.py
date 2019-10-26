@@ -30,6 +30,9 @@ class Storage(Protocol):
     def find(self, email: EMail) -> Optional[Registration]:
         ...
 
+    def delete(self, email: EMail) -> None:
+        ...
+
 
 class ConfirmationRequester(Protocol):
     def request_confirmation(
@@ -85,11 +88,14 @@ class RegistrationService:
         if registration is None or registration.confirm_token != token:
             raise UnauthorizedException("Invalid token.")
 
-        registration.state = State.subscribed
-        registration.last_update = self._utcnow()
-        registration.confirm_token = None
-        registration.confirm_action = None
-        self._storage.upsert(registration)
+        if registration.confirm_action == Action.subscribe:
+            registration.state = State.subscribed
+            registration.last_update = self._utcnow()
+            registration.confirm_token = None
+            registration.confirm_action = None
+            self._storage.upsert(registration)
+        elif registration.confirm_action == Action.unsubscribe:
+            self._storage.delete(email)
 
     def _perform_state_change_requiring_confirmation(self, registration):
         self._storage.upsert(registration)

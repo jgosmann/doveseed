@@ -29,6 +29,9 @@ class InMemoryStorage:
             return self.data[email]
         return None
 
+    def delete(self, email: EMail) -> None:
+        del self.data[email]
+
 
 class MockTokenGenerator:
     def __init__(self):
@@ -303,17 +306,41 @@ class TestRegistrationServiceConfirm:
             confirm_action=None,
         )
 
-    def test_confirm_with_invalid_token_raises_exception(
+    def test_confirm_with_valid_token_removes_subscription(
         self, registration_service, storage, utcnow
+    ):
+        given_email = EMail("pending@test.org")
+        given_token = Token(b"token")
+        storage.upsert(
+            Registration(
+                email=given_email,
+                state=State.pending_unsubscribe,
+                last_update=utcnow() - timedelta(days=1),
+                confirm_token=given_token,
+                confirm_action=Action.unsubscribe,
+            )
+        )
+
+        registration_service.confirm(given_email, given_token)
+
+        assert storage.find(given_email) is None
+
+    @pytest.mark.parametrize(
+        "state", (State.pending_subscribe, State.pending_unsubscribe)
+    )
+    def test_confirm_with_invalid_token_raises_exception(
+        self, state, registration_service, storage, utcnow
     ):
         given_email = EMail("pending@test.org")
         storage.upsert(
             Registration(
                 email=given_email,
-                state=State.pending_subscribe,
+                state=state,
                 last_update=utcnow() - timedelta(days=1),
                 confirm_token=Token(b"actual token"),
-                confirm_action=Action.subscribe,
+                confirm_action=Action.subscribe
+                if state == State.pending_subscribe
+                else Action.unsubscribe,
             )
         )
 

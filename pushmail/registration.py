@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import NewType
+from typing import NewType, Optional
 
 
 EMail = NewType("EMail", str)
@@ -18,7 +18,7 @@ class Registration:
     state: State
     confirm_token: Token
     confirm_action: Action
-    immediate_unsubscribe_token: Token
+    immediate_unsubscribe_token: Optional[Token] = None
 
 
 class RegistrationService:
@@ -28,4 +28,10 @@ class RegistrationService:
         self.utcnow = utcnow
 
     def subscribe(self, email: EMail):
-        raise NotImplementedError()
+        registration = Registration(
+            email=email,
+            last_update=self.utcnow(),
+            state=State.pending_subscribe,
+            confirm_token=next(self.token_generator),
+            confirm_action=Action.subscribe)
+        self.storage.insert(registration)

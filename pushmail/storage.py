@@ -35,4 +35,4 @@ class TinyDbStorage:
         return Registration(**data)
 
     def delete(self, email: EMail) -> None:
-        pass
+        self._tinydb.remove(Query().email == email)

@@ -82,3 +82,23 @@ class TestTinyDbStorage:
             last_update=last_update,
             state=State.subscribed,
         )
+
+    def test_delete_existing_entity(self, tiny_db, tiny_db_storage):
+        tiny_db.insert(
+            {
+                "email": "mail@test.org",
+                "last_update": datetime(2019, 10, 25, 13, 37).isoformat(),
+                "state": "subscribed",
+                "confirm_action": None,
+                "confirm_token": None,
+                "immediate_unsubscribe_token": None,
+            }
+        )
+
+        tiny_db_storage.delete(EMail("mail@test.org"))
+
+        assert tiny_db.get(Query().email == "mail@test.org") is None
+
+    def test_delete_non_existing_entity(self, tiny_db, tiny_db_storage):
+        tiny_db_storage.delete(EMail("mail@test.org"))
+        assert tiny_db.get(Query().email == "mail@test.org") is None

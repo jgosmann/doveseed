@@ -67,7 +67,7 @@ class RegistrationService:
             if registration.confirm_token is None:
                 registration.confirm_token = next(self._token_generator)
 
-            self._perform_state_change(registration)
+            self._perform_state_change_requiring_confirmation(registration)
 
     def unsubscribe(self, email: EMail):
         registration = self._storage.find(email)
@@ -77,12 +77,28 @@ class RegistrationService:
             registration.last_update = self._utcnow()
             registration.confirm_token = next(self._token_generator)
             registration.confirm_action = Action.unsubscribe
-            self._perform_state_change(registration)
+            self._perform_state_change_requiring_confirmation(registration)
 
-    def _perform_state_change(self, registration):
+    def confirm(self, email: EMail, token: Token):
+        registration = self._storage.find(email)
+
+        if registration is None or registration.confirm_token != token:
+            raise UnauthorizedException("Invalid token.")
+
+        registration.state = State.subscribed
+        registration.last_update = self._utcnow()
+        registration.confirm_token = None
+        registration.confirm_action = None
+        self._storage.upsert(registration)
+
+    def _perform_state_change_requiring_confirmation(self, registration):
         self._storage.upsert(registration)
         self._confirmation_requester.request_confirmation(
             registration.email,
             action=registration.confirm_action,
             confirm_token=registration.confirm_token,
         )
+
+
+class UnauthorizedException(Exception):
+    pass

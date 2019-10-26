@@ -13,6 +13,7 @@ from pushmail.registration import (
     RegistrationService,
     State,
     Token,
+    UnauthorizedException,
 )
 
 
@@ -273,3 +274,48 @@ class TestRegistrationServiceUnsubscribe:
             action=Action.unsubscribe,
             confirm_token=token_generator.generated_tokens[0],
         )
+
+
+class TestRegistrationServiceConfirm:
+    def test_confirm_with_valid_token_activates_subscription(
+        self, registration_service, storage, utcnow
+    ):
+        given_email = EMail("pending@test.org")
+        given_token = Token(b"token")
+        storage.upsert(
+            Registration(
+                email=given_email,
+                state=State.pending_subscribe,
+                last_update=utcnow() - timedelta(days=1),
+                confirm_token=given_token,
+                confirm_action=Action.subscribe,
+            )
+        )
+
+        registration_service.confirm(given_email, given_token)
+
+        stored = storage.find(given_email)
+        assert stored == Registration(
+            email=given_email,
+            state=State.subscribed,
+            last_update=utcnow(),
+            confirm_token=None,
+            confirm_action=None,
+        )
+
+    def test_confirm_with_invalid_token_raises_exception(
+        self, registration_service, storage, utcnow
+    ):
+        given_email = EMail("pending@test.org")
+        storage.upsert(
+            Registration(
+                email=given_email,
+                state=State.pending_subscribe,
+                last_update=utcnow() - timedelta(days=1),
+                confirm_token=Token(b"actual token"),
+                confirm_action=Action.subscribe,
+            )
+        )
+
+        with pytest.raises(UnauthorizedException):
+            registration_service.confirm(given_email, Token(b"invalid token"))

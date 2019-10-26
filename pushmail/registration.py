@@ -28,24 +28,33 @@ class Storage(Protocol):
         ...
 
 
+class Mailer(Protocol):
+    def mail_subscribe_confirm(self, email: EMail, *, confirm_token: Token) -> None:
+        ...
+
+
 class RegistrationService:
     def __init__(
         self,
         *,
         storage: Storage,
+        mailer: Mailer,
         token_generator: Iterator[Token],
         utcnow: Callable[[], datetime]
     ):
         self.storage = storage
+        self.mailer = mailer
         self.token_generator = token_generator
         self.utcnow = utcnow
 
     def subscribe(self, email: EMail):
+        confirm_token = next(self.token_generator)
         registration = Registration(
             email=email,
             last_update=self.utcnow(),
             state=State.pending_subscribe,
-            confirm_token=next(self.token_generator),
+            confirm_token=confirm_token,
             confirm_action=Action.subscribe,
         )
         self.storage.insert(registration)
+        self.mailer.mail_subscribe_confirm(email, confirm_token=confirm_token)

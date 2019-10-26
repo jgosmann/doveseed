@@ -1,20 +1,24 @@
 from datetime import datetime
 import itertools
+from unittest.mock import MagicMock
+from typing import cast, Dict, List
 
 import pytest
 
 from pushmail.registration import (
     Action,
     EMail,
+    Mailer,
     Registration,
     RegistrationService,
     State,
+    Token,
 )
 
 
 class InMemoryStorage:
     def __init__(self):
-        self.data = {}
+        self.data: Dict[EMail, Registration] = {}
 
     def insert(self, registration: Registration):
         self.data[registration.email] = registration
@@ -25,19 +29,29 @@ class InMemoryStorage:
 
 class MockTokenGenerator:
     def __init__(self):
-        self.generated_tokens = []
+        self.generated_tokens: List[Token] = []
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        self.generated_tokens.append('token' + str(len(self.generated_tokens)))
+        self.generated_tokens.append("token" + str(len(self.generated_tokens)))
         return self.generated_tokens[-1]
+
+
+class MockMailer:
+    def __init__(self):
+        self.mail_subscribe_confirm = MagicMock()
 
 
 @pytest.fixture
 def storage():
     return InMemoryStorage()
+
+
+@pytest.fixture
+def mailer():
+    return MockMailer()
 
 
 @pytest.fixture
@@ -51,14 +65,14 @@ def utcnow():
 
 
 @pytest.fixture
-def registration_service(storage, token_generator, utcnow):
+def registration_service(storage, mailer, token_generator, utcnow):
     return RegistrationService(
-        storage=storage, token_generator=token_generator, utcnow=utcnow
+        storage=storage, mailer=mailer, token_generator=token_generator, utcnow=utcnow
     )
 
 
 class TestRegistrationServiceSubscribe:
-    def test_creates_new_registration_for_non_existing_mail(
+    def test_if_email_unknown_creates_registration(
         self, registration_service, storage, token_generator, utcnow
     ):
         given_email = EMail("new@test.org")
@@ -71,4 +85,13 @@ class TestRegistrationServiceSubscribe:
             confirm_token=token_generator.generated_tokens[0],
             confirm_action=Action.subscribe,
             immediate_unsubscribe_token=None,
+        )
+
+    def test_if_email_unknown_sends_subscription_confirm_mail(
+        self, registration_service, mailer, token_generator, utcnow
+    ):
+        given_email = EMail("new@test.org")
+        registration_service.subscribe(given_email)
+        mailer.mail_subscribe_confirm.assert_called_with(
+            given_email, confirm_token=token_generator.generated_tokens[0]
         )

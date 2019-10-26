@@ -18,13 +18,16 @@ class Registration:
     email: EMail
     last_update: datetime
     state: State
-    confirm_token: Token
-    confirm_action: Action
+    confirm_token: Optional[Token] = None
+    confirm_action: Optional[Action] = None
     immediate_unsubscribe_token: Optional[Token] = None
 
 
 class Storage(Protocol):
-    def insert(self, registration: Registration) -> None:
+    def upsert(self, registration: Registration) -> None:
+        ...
+
+    def find(self, email: EMail) -> Optional[Registration]:
         ...
 
 
@@ -42,19 +45,27 @@ class RegistrationService:
         token_generator: Iterator[Token],
         utcnow: Callable[[], datetime]
     ):
-        self.storage = storage
-        self.mailer = mailer
-        self.token_generator = token_generator
-        self.utcnow = utcnow
+        self._storage = storage
+        self._mailer = mailer
+        self._token_generator = token_generator
+        self._utcnow = utcnow
 
     def subscribe(self, email: EMail):
-        confirm_token = next(self.token_generator)
-        registration = Registration(
-            email=email,
-            last_update=self.utcnow(),
-            state=State.pending_subscribe,
-            confirm_token=confirm_token,
-            confirm_action=Action.subscribe,
-        )
-        self.storage.insert(registration)
-        self.mailer.mail_subscribe_confirm(email, confirm_token=confirm_token)
+        registration = self._storage.find(email)
+        if registration is None:
+            registration = Registration(
+                email=email,
+                last_update=self._utcnow(),
+                state=State.pending_subscribe,
+                confirm_action=Action.subscribe,
+            )
+
+        if registration.state == State.pending_subscribe:
+            registration.last_update = self._utcnow()
+            if registration.confirm_token is None:
+                registration.confirm_token = next(self._token_generator)
+
+            self._storage.upsert(registration)
+            self._mailer.mail_subscribe_confirm(
+                email, confirm_token=registration.confirm_token
+            )

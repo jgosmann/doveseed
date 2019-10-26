@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import itertools
 from unittest.mock import MagicMock
-from typing import cast, Dict, List
+from typing import cast, Dict, List, Optional
 
 import pytest
 
@@ -20,11 +20,13 @@ class InMemoryStorage:
     def __init__(self):
         self.data: Dict[EMail, Registration] = {}
 
-    def insert(self, registration: Registration):
+    def upsert(self, registration: Registration):
         self.data[registration.email] = registration
 
-    def find(self, email: EMail) -> Registration:
-        return self.data[email]
+    def find(self, email: EMail) -> Optional[Registration]:
+        if email in self.data:
+            return self.data[email]
+        return None
 
 
 class MockTokenGenerator:
@@ -35,7 +37,9 @@ class MockTokenGenerator:
         return self
 
     def __next__(self):
-        self.generated_tokens.append("token" + str(len(self.generated_tokens)))
+        self.generated_tokens.append(
+            Token(b"token" + bytes(len(self.generated_tokens)))
+        )
         return self.generated_tokens[-1]
 
 
@@ -59,9 +63,12 @@ def token_generator():
     return MockTokenGenerator()
 
 
+NOW = datetime(2019, 10, 25, 13, 37)
+
+
 @pytest.fixture
 def utcnow():
-    return lambda: datetime(2019, 10, 25, 13, 37)
+    return lambda: NOW
 
 
 @pytest.fixture
@@ -94,4 +101,75 @@ class TestRegistrationServiceSubscribe:
         registration_service.subscribe(given_email)
         mailer.mail_subscribe_confirm.assert_called_with(
             given_email, confirm_token=token_generator.generated_tokens[0]
+        )
+
+    def test_if_subscription_is_pending_bumps_last_update(
+        self, registration_service, storage, token_generator, utcnow
+    ):
+        given_email = EMail("pending@test.org")
+        storage.upsert(
+            Registration(
+                email=given_email,
+                state=State.pending_subscribe,
+                last_update=utcnow() - timedelta(days=1),
+                confirm_token=next(token_generator),
+                confirm_action=Action.subscribe,
+                immediate_unsubscribe_token=None,
+            )
+        )
+
+        registration_service.subscribe(given_email)
+
+        stored = storage.find(given_email)
+        assert stored == Registration(
+            email=given_email,
+            state=State.pending_subscribe,
+            last_update=utcnow(),
+            confirm_token=token_generator.generated_tokens[0],
+            confirm_action=Action.subscribe,
+        )
+
+    def test_if_subscription_is_pending_resends_confirm_mail(
+        self, registration_service, storage, mailer, token_generator, utcnow
+    ):
+        given_email = EMail("pending@test.org")
+        storage.upsert(
+            Registration(
+                email=given_email,
+                state=State.pending_subscribe,
+                last_update=utcnow() - timedelta(days=1),
+                confirm_token=next(token_generator),
+                confirm_action=Action.subscribe,
+            )
+        )
+
+        registration_service.subscribe(given_email)
+
+        mailer.mail_subscribe_confirm.assert_called_with(
+            given_email, confirm_token=token_generator.generated_tokens[0]
+        )
+
+    @pytest.mark.parametrize("state", (State.subscribed, State.pending_unsubscribe))
+    def test_if_subscribed_no_effect(
+        self, state, registration_service, storage, mailer, token_generator, utcnow
+    ):
+        given_email = EMail("subscribed@test.org")
+        storage.upsert(
+            Registration(
+                email=given_email,
+                state=state,
+                last_update=utcnow() - timedelta(days=1),
+                immediate_unsubscribe_token=Token(b"token"),
+            )
+        )
+
+        registration_service.subscribe(given_email)
+
+        stored = storage.find(given_email)
+        assert not mailer.mail_subscribe_confirm.called
+        assert stored == Registration(
+            email=given_email,
+            state=state,
+            last_update=utcnow() - timedelta(days=1),
+            immediate_unsubscribe_token=Token(b"token"),
         )

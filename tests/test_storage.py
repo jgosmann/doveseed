@@ -4,7 +4,7 @@ import pytest
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
-from pushmail.registration import EMail, Registration, State
+from pushmail.registration import Action, EMail, Registration, State, Token
 from pushmail.storage import TinyDbStorage
 
 
@@ -102,3 +102,28 @@ class TestTinyDbStorage:
     def test_delete_non_existing_entity(self, tiny_db, tiny_db_storage):
         tiny_db_storage.delete(EMail("mail@test.org"))
         assert tiny_db.get(Query().email == "mail@test.org") is None
+
+    @pytest.mark.parametrize(
+        "instance",
+        (
+            Registration(
+                email=EMail("mail@test.org"),
+                last_update=datetime(2019, 10, 25, 13, 37),
+                state=State.subscribed,
+                confirm_action=None,
+                confirm_token=None,
+                immediate_unsubscribe_token=None,
+            ),
+            Registration(
+                email=EMail("mail2@test.org"),
+                last_update=datetime(2019, 10, 25, 13, 38),
+                state=State.pending_subscribe,
+                confirm_action=Action.subscribe,
+                confirm_token=Token(b"token"),
+                immediate_unsubscribe_token=Token(b"another token"),
+            ),
+        ),
+    )
+    def test_roundtrip(self, instance, tiny_db_storage):
+        tiny_db_storage.upsert(instance)
+        assert tiny_db_storage.find(instance.email) == instance

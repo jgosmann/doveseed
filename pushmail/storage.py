@@ -2,7 +2,7 @@ from dataclasses import asdict, fields
 from datetime import datetime
 from enum import Enum
 from inspect import isclass
-from typing import Optional
+from typing import Optional, Union
 
 from tinydb import TinyDB, Query
 
@@ -15,11 +15,11 @@ class TinyDbStorage:
 
     def upsert(self, registration: Registration) -> None:
         data = asdict(registration)
-        for k, v in data.items():
-            if isinstance(v, datetime):
-                data[k] = v.isoformat()
-            elif isinstance(v, Enum):
-                data[k] = v.name
+        for k, value in data.items():
+            if isinstance(value, datetime):
+                data[k] = value.isoformat()
+            elif isinstance(value, Enum):
+                data[k] = value.name
         self._tinydb.upsert(data, Query().email == registration.email)
 
     def find(self, email: EMail) -> Optional[Registration]:
@@ -28,10 +28,17 @@ class TinyDbStorage:
             return None
 
         for field in fields(Registration):
-            if field.type is datetime:
+            type_info = field.type
+            if getattr(type_info, "__origin__", None) is Union:
+                type_info = next(x for x in type_info.__args__ if x is not type(None))
+            if type_info is datetime:
                 data[field.name] = datetime.fromisoformat(data[field.name])
-            elif isclass(field.type) and issubclass(field.type, Enum):
-                data[field.name] = field.type[data[field.name]]
+            elif (
+                isclass(type_info)
+                and issubclass(type_info, Enum)
+                and data[field.name] is not None
+            ):
+                data[field.name] = type_info[data[field.name]]
         return Registration(**data)
 
     def delete(self, email: EMail) -> None:

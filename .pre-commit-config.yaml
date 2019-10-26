@@ -12,10 +12,6 @@ repos:
     rev: master
     hooks:
     -   id: mypy
--   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v2.4.3
-    hooks:
-    -   id: pylint
 -   repo: https://github.com/psf/black
     rev: stable
     hooks:

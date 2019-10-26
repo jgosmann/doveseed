@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import NewType, Optional
+from typing import Callable, Iterator, NewType, Optional
+
+from typing_extensions import Protocol
 
 
 EMail = NewType("EMail", str)
@@ -21,8 +23,19 @@ class Registration:
     immediate_unsubscribe_token: Optional[Token] = None
 
 
+class Storage(Protocol):
+    def insert(self, registration: Registration) -> None:
+        ...
+
+
 class RegistrationService:
-    def __init__(self, *, storage, token_generator, utcnow):
+    def __init__(
+        self,
+        *,
+        storage: Storage,
+        token_generator: Iterator[Token],
+        utcnow: Callable[[], datetime]
+    ):
         self.storage = storage
         self.token_generator = token_generator
         self.utcnow = utcnow
@@ -33,5 +46,6 @@ class RegistrationService:
             last_update=self.utcnow(),
             state=State.pending_subscribe,
             confirm_token=next(self.token_generator),
-            confirm_action=Action.subscribe)
+            confirm_action=Action.subscribe,
+        )
         self.storage.insert(registration)

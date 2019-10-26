@@ -60,3 +60,25 @@ class TestTinyDbStorage:
             "confirm_token": None,
             "immediate_unsubscribe_token": None,
         }
+
+    def test_find_of_non_exsting_entity_returns_none(self, tiny_db_storage):
+        assert tiny_db_storage.find(EMail("unknown@test.org")) is None
+
+    def test_find_returns_matching_entity(self, tiny_db, tiny_db_storage):
+        last_update = datetime(2019, 10, 25, 13, 37)
+        tiny_db.insert(
+            {
+                "email": "mail@test.org",
+                "last_update": last_update.isoformat(),
+                "state": "subscribed",
+                "confirm_action": None,
+                "confirm_token": None,
+                "immediate_unsubscribe_token": None,
+            }
+        )
+
+        assert tiny_db_storage.find(EMail("mail@test.org")) == Registration(
+            email=EMail("mail@test.org"),
+            last_update=last_update,
+            state=State.subscribed,
+        )

@@ -72,3 +72,36 @@ def test_subscription_and_unsubscription_flow(client, db, confirmation_requester
     )
 
     assert db.get(Query().email == given_email) == None
+
+
+def test_confirm_unauthorized(client, db, confirmation_requester):
+    given_email = EMail("foo@test.org")
+    assert_success(client.post(f"/subscribe/{given_email}"))
+
+    unknown_email_response = client.post(
+        f"/confirm/non-{given_email}",
+        headers=[
+            ("Authorization", "Bearer " + confirmation_requester.tokens[given_email])
+        ],
+    )
+    assert unknown_email_response.status_code == http.HTTPStatus.UNAUTHORIZED
+
+    missing_auth_response = client.post(f"/confirm/{given_email}")
+    assert missing_auth_response.status_code == http.HTTPStatus.UNAUTHORIZED
+
+    assert (
+        client.post(
+            f"/confirm/non-{given_email}",
+            headers=[
+                ("Authorization", "Basic " + confirmation_requester.tokens[given_email])
+            ],
+        )
+    ).status_code == http.HTTPStatus.UNAUTHORIZED
+
+    known_email_response = client.post(
+        f"/confirm/non-{given_email}",
+        headers=[("Authorization", "Bearer invalid-token")],
+    )
+    assert known_email_response.status_code == http.HTTPStatus.UNAUTHORIZED
+
+    assert known_email_response.data == unknown_email_response.data

@@ -6,7 +6,7 @@ import pytest
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
-from pushmail.endpoints import create_app
+from pushmail.app import create_app
 from pushmail.registration import Action, EMail, Token
 
 

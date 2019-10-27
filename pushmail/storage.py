@@ -1,3 +1,4 @@
+from base64 import b64decode, b64encode
 from dataclasses import asdict, fields
 from datetime import datetime
 from enum import Enum
@@ -16,7 +17,9 @@ class TinyDbStorage:
     def upsert(self, registration: Registration) -> None:
         data = asdict(registration)
         for k, value in data.items():
-            if isinstance(value, datetime):
+            if isinstance(value, bytes):
+                data[k] = b64encode(value).decode("ascii")
+            elif isinstance(value, datetime):
                 data[k] = value.isoformat()
             elif isinstance(value, Enum):
                 data[k] = value.name
@@ -28,17 +31,22 @@ class TinyDbStorage:
             return None
 
         for field in fields(Registration):
+            if data[field.name] is None:
+                continue
+
             type_info = field.type
             if getattr(type_info, "__origin__", None) is Union:
                 type_info = next(x for x in type_info.__args__ if x is not type(None))
-            if type_info is datetime:
+
+            if getattr(type_info, "__supertype__", None) is bytes:
+                data[field.name] = type_info(
+                    b64decode(data[field.name].encode("ascii"))
+                )
+            elif type_info is datetime:
                 data[field.name] = datetime.fromisoformat(data[field.name])
-            elif (
-                isclass(type_info)
-                and issubclass(type_info, Enum)
-                and data[field.name] is not None
-            ):
+            elif isclass(type_info) and issubclass(type_info, Enum):
                 data[field.name] = type_info[data[field.name]]
+
         return Registration(**data)
 
     def delete(self, email: EMail) -> None:

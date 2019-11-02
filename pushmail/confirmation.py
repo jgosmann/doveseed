@@ -1,45 +1,20 @@
 from base64 import b64encode
-from contextlib import contextmanager
 from email.message import EmailMessage
 import html
 import json
 import os
 import os.path
-from smtplib import SMTP
 from urllib.parse import quote
 from typing import Any, Callable, ContextManager, Dict
 
 from jinja2 import Environment, FileSystemLoader, Template
 
+from .smtp import ConnectionManager
 from .registration import EMail, Action, Token
 
 
-class _EstablishedSmtpConnection:
-    def __init__(self, smtp):
-        self._smtp = smtp
-
-    def send_message(self, msg):
-        msg["From"] = "Jan's outdoor adventures <adventures@jgosmann.de>"
-        return self._smtp.send_message(msg)
-
-
-def SmtpConnection(host, user, password):
-    @contextmanager
-    def connection_manager():
-        with SMTP(host) as smtp:
-            smtp.starttls()
-            smtp.login(user, password)
-            yield _EstablishedSmtpConnection(smtp)
-
-    return connection_manager
-
-
 class EmailConfirmationRequester:
-    def __init__(
-        self,
-        connection: Callable[[], ContextManager[_EstablishedSmtpConnection]],
-        template_path: str,
-    ):
+    def __init__(self, connection: ConnectionManager, template_path: str):
         self._connection = connection
         self._template_path = template_path
         self._template_env = Environment(loader=FileSystemLoader(self._template_path))
@@ -73,6 +48,7 @@ class EmailConfirmationRequester:
         msg.set_content(plain_text)
         msg.add_alternative(html, subtype="html")
         msg["Subject"] = subject
+        msg["From"] = "Jan's outdoor adventures <adventures@jgosmann.de>"
         msg["To"] = email
 
         with self._connection() as connection:

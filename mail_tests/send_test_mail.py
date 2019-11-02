@@ -2,12 +2,13 @@
 
 import getpass
 
-from pushmail.confirmation import EmailConfirmationRequester, SmtpConnection
+from pushmail.confirmation import EmailConfirmationRequester
 from pushmail.registration import Action, EMail, Token
+from pushmail.smtp import smtp_connection
 
 
 if __name__ == "__main__":
-    conn = SmtpConnection(
+    conn = smtp_connection(
         "v22013121181015858.yourvserver.net",
         "adventures@jgosmann.de",
         getpass.getpass("smtp pass:"),

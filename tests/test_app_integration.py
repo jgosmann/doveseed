@@ -7,7 +7,7 @@ from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
 from pushmail.app import create_app
-from pushmail.registration import Action, EMail, Token
+from pushmail.types import EMail, Token, Action
 
 
 class ConfirmationRequester:

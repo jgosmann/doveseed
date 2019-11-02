@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 from jinja2 import Environment
 
-from .registration import Action, EMail, Token
+from pushmail.types import EMail, Token, Action
 
 
 class FileSystemBinaryLoader:

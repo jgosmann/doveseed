@@ -1,6 +1,6 @@
 import os
 
-from .registration import Token
+from pushmail.types import Token
 
 
 def gen_secure_token():

@@ -4,7 +4,8 @@ import pytest
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
-from pushmail.registration import Action, EMail, Registration, State, Token
+from pushmail.registration import Registration
+from pushmail.types import EMail, Token, State, Action
 from pushmail.storage import TinyDbStorage
 
 

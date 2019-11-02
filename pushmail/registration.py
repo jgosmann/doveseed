@@ -1,16 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
-from typing import Callable, Iterator, NewType, Optional
+from typing import Callable, Iterator, Optional
 
 from typing_extensions import Protocol
 
-
-EMail = NewType("EMail", str)
-Token = NewType("Token", bytes)
-
-State = Enum("State", ("pending_subscribe", "subscribed", "pending_unsubscribe"))
-Action = Enum("Action", ("subscribe", "unsubscribe"))
+from pushmail.types import EMail, Token, State, Action
 
 
 @dataclass

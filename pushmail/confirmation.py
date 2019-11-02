@@ -11,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 from typing_extensions import Protocol
 
 from .smtp import ConnectionManager
-from .registration import EMail, Action, Token
+from pushmail.types import EMail, Token, Action
 
 
 class EmailMessageProvider(Protocol):

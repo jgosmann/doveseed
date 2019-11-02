@@ -6,7 +6,8 @@ from typing import Optional
 from flask import Flask, request
 from tinydb import TinyDB
 
-from .registration import EMail, RegistrationService, Token, UnauthorizedException
+from .registration import RegistrationService, UnauthorizedException
+from pushmail.types import EMail, Token
 from .storage import TinyDbStorage
 from .token_gen import gen_secure_token
 

@@ -6,7 +6,7 @@ from jinja2 import BaseLoader
 import pytest
 
 from pushmail.email_templating import EmailFromTemplateProvider
-from pushmail.registration import Action, EMail, Token
+from pushmail.types import EMail, Token, Action
 
 
 class MockTemplateLoader(BaseLoader):

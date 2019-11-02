@@ -6,15 +6,12 @@ from typing import cast, Dict, List, Optional
 import pytest
 
 from pushmail.registration import (
-    Action,
     ConfirmationRequester,
-    EMail,
     Registration,
     RegistrationService,
-    State,
-    Token,
     UnauthorizedException,
 )
+from pushmail.types import EMail, Token, State, Action
 
 
 class InMemoryStorage:

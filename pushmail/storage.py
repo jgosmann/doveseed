@@ -7,7 +7,8 @@ from typing import Optional, Union
 
 from tinydb import TinyDB, Query
 
-from .registration import EMail, Registration
+from .registration import Registration
+from pushmail.types import EMail
 
 
 class TinyDbStorage:

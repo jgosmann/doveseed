@@ -1,0 +1,15 @@
+{
+  "db": "doveseed-db.json",
+  "smtp": {
+    "host": "",
+    "user": "",
+    "password": ""
+  },
+  "template_vars": {
+    "display_name": "Doveseed",
+    "host": "doveseed.local",
+    "sender": "Doveseed <doveseed@doveseed.local>",
+    "confirm_url_format": "https://{host}/confirm/{email}?token={token}"
+  },
+  "email_templates": "templates/example"
+}

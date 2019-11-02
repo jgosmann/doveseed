@@ -6,3 +6,5 @@ __pycache__
 test.json
 .DS_Store
 .idea
+config.json
+doveseed-db.json

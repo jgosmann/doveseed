@@ -1,4 +1,3 @@
-from base64 import b64encode
 import http
 from typing import Dict
 
@@ -6,7 +5,7 @@ import pytest
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
-from doveseed.app import create_app
+from doveseed.app import create_app_from_instances
 from doveseed.types import Email, Token, Action
 
 
@@ -36,7 +35,7 @@ def db():
 
 @pytest.fixture
 def client(db, confirmation_requester):
-    app = create_app(db, confirmation_requester)
+    app = create_app_from_instances(db, confirmation_requester)
     with app.test_client() as client:
         yield client
 
@@ -71,7 +70,7 @@ def test_subscription_and_unsubscription_flow(client, db, confirmation_requester
         )
     )
 
-    assert db.get(Query().email == given_email) == None
+    assert db.get(Query().email == given_email) is None
 
 
 def test_confirm_unauthorized(client, db, confirmation_requester):

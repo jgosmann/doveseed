@@ -1,14 +1,15 @@
 from base64 import b64decode, b64encode
+from collections.abc import Mapping
 from dataclasses import asdict, fields, is_dataclass
 from datetime import datetime
 from enum import Enum
 from inspect import isclass
-from typing import Optional, Union
+from typing import Any, Dict, Optional, Type, Union
 
 from tinydb import TinyDB, Query
 
 from .registration import Registration
-from doveseed.types import Email
+from .types import Email
 
 
 class TinyDbStorage:
@@ -17,21 +18,29 @@ class TinyDbStorage:
 
     def upsert(self, registration: Registration) -> None:
         data = asdict(registration)
+        self._serialize_in_place(data)
+        self._tinydb.upsert(data, Query().email == registration.email)
+
+    def _serialize_in_place(self, data: Dict[str, Any]):
         for k, value in data.items():
+            if isinstance(value, Mapping):
+                self._serialize_in_place(data[k])
             if isinstance(value, bytes):
                 data[k] = b64encode(value).decode("ascii")
             elif isinstance(value, datetime):
                 data[k] = value.isoformat()
             elif isinstance(value, Enum):
                 data[k] = value.name
-        self._tinydb.upsert(data, Query().email == registration.email)
 
     def find(self, email: Email) -> Optional[Registration]:
         data = self._tinydb.get(Query().email == email)
         if data is None:
             return None
+        self._deserialize_in_place(Registration, data)
+        return Registration(**data)
 
-        for field in fields(Registration):
+    def _deserialize_in_place(self, to_type: Type, data: Dict[str, Any]):
+        for field in fields(to_type):
             if data[field.name] is None:
                 continue
 
@@ -39,7 +48,7 @@ class TinyDbStorage:
             if getattr(type_info, "__origin__", None) is Union:
                 type_info = next(x for x in type_info.__args__ if x is not type(None))
 
-            if getattr(type_info, "__supertype__", None) is bytes:
+            if type_info is bytes:
                 data[field.name] = type_info(
                     b64decode(data[field.name].encode("ascii"))
                 )
@@ -48,9 +57,8 @@ class TinyDbStorage:
             elif isclass(type_info) and issubclass(type_info, Enum):
                 data[field.name] = type_info[data[field.name]]
             elif is_dataclass(type_info):
+                self._deserialize_in_place(type_info, data[field.name])
                 data[field.name] = type_info(**data[field.name])
-
-        return Registration(**data)
 
     def delete(self, email: Email) -> None:
         self._tinydb.remove(Query().email == email)

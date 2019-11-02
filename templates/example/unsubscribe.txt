@@ -1,0 +1,9 @@
+Hi there,
+
+to end your subscription to {{ display_name }}, please click the following link:
+
+{{ confirm_link }}
+
+If you did not unsubscribe, you can ignore this email.
+
+Thank you!

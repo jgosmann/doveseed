@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="x-dns-prefetch-control" content="off">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>{{ subject | e }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style type="text/css">{% include 'files/style.css' %}</style>
+    </head>
+    <body>
+        <main>
+            <p>Hi there,</p>
+            <p>please confirm your subscription to <a href="https://{{ host }}">{{ display_name }}</a> by clicking the following link:</p>
+            <p><a href="{{ confirm_link }}" class="btn" rel="nofollow">Confirm your subscription.</a></p>
+            <p>If you did not subscribe, you can ignore this email.</p>
+            <p>Thank you!</p>
+        </main>
+    </body>
+</html>

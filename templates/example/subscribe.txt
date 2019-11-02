@@ -1,0 +1,9 @@
+Hi there,
+
+please confirm your subscription to {{ display_name }} under the following link:
+
+{{ confirm_link }}
+
+If you did not subscribe, you can ignore this email.
+
+Thank you!

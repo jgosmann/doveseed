@@ -17,7 +17,7 @@ class ConfirmationRequester:
     def request_confirmation(
         self, email: Email, *, action: Action, confirm_token: Token
     ):
-        self.tokens[email] = b64encode(confirm_token).decode("ascii")
+        self.tokens[email] = confirm_token.to_string()
 
 
 def assert_success(response):

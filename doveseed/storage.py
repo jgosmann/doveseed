@@ -1,5 +1,5 @@
 from base64 import b64decode, b64encode
-from dataclasses import asdict, fields
+from dataclasses import asdict, fields, is_dataclass
 from datetime import datetime
 from enum import Enum
 from inspect import isclass
@@ -47,6 +47,8 @@ class TinyDbStorage:
                 data[field.name] = datetime.fromisoformat(data[field.name])
             elif isclass(type_info) and issubclass(type_info, Enum):
                 data[field.name] = type_info[data[field.name]]
+            elif is_dataclass(type_info):
+                data[field.name] = type_info(**data[field.name])
 
         return Registration(**data)
 

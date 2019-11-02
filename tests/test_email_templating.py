@@ -83,7 +83,7 @@ class TestGetConfirmationRequestMsg:
         )
 
         expected_link = "https://test.local/confirm/email%40local?token=" + quote(
-            b64encode(token).decode("ascii")
+            token.to_string()
         )
         assert msg["Subject"] == expected_link
         assert (

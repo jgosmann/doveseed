@@ -35,7 +35,7 @@ class EmailFromTemplateProvider:
     def get_confirmation_request_msg(
         self, to_email: Email, *, action: Action, confirm_token: Token
     ) -> EmailMessage:
-        encoded_token = quote(b64encode(confirm_token).decode("ascii"))
+        encoded_token = quote(confirm_token.to_string())
         confirm_link = self.settings.confirm_url_format.format(
             email=quote(to_email), host=self.settings.host, token=encoded_token
         )

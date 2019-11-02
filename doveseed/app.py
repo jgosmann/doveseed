@@ -39,7 +39,7 @@ def create_app(
             auth_type, token = request.headers["Authorization"].split(" ", 1)
             if auth_type.lower() != "bearer":
                 raise UnauthorizedException("Requires bearer authorization.")
-            return Token(b64decode(token.encode("ascii")))
+            return Token.from_string(token)
         except (KeyError, ValueError):
             raise UnauthorizedException("Improper Authorization header.")
 

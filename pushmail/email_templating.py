@@ -37,7 +37,7 @@ class EmailFromTemplateProvider:
     ) -> EmailMessage:
         encoded_token = quote(b64encode(confirm_token).decode("ascii"))
         confirm_link = self.settings.confirm_url_format.format(
-            email=to_email, host=self.settings.host, token=encoded_token
+            email=quote(to_email), host=self.settings.host, token=encoded_token
         )
 
         substitutions = dict(

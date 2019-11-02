@@ -43,7 +43,7 @@ parser.add_argument(
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    user = args.user[0] if args.user else args.from_mail[0]
+    user = args.user if args.user else args.from_mail[0]
 
     conn = smtp_connection(args.host[0], user, getpass.getpass(f"Password for {user}:"))
 

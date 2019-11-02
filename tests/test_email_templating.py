@@ -79,10 +79,10 @@ class TestGetConfirmationRequestMsg:
             binary_loader=MockBinaryLoader(dict()),
         )
         msg = provider.get_confirmation_request_msg(
-            EMail("email"), action=Action.subscribe, confirm_token=token
+            EMail("email@local"), action=Action.subscribe, confirm_token=token
         )
 
-        expected_link = "https://test.local/confirm/email?token=" + quote(
+        expected_link = "https://test.local/confirm/email%40local?token=" + quote(
             b64encode(token).decode("ascii")
         )
         assert msg["Subject"] == expected_link

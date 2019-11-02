@@ -3,3 +3,4 @@
 __pycache__
 *.egg-info
 test.json
+.DS_Store

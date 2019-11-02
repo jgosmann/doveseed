@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pushmail"
+name = "doveseed"
 version = "0.1.0"
 description = ""
 authors = ["Jan Gosmann <jan@hyper-world.de>"]

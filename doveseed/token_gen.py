@@ -1,6 +1,6 @@
 import os
 
-from pushmail.types import Token
+from doveseed.types import Token
 
 
 def gen_secure_token():

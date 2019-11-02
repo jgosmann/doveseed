@@ -4,7 +4,7 @@ from typing import Callable, Iterator, Optional
 
 from typing_extensions import Protocol
 
-from pushmail.types import Email, Token, State, Action
+from doveseed.types import Email, Token, State, Action
 
 
 @dataclass

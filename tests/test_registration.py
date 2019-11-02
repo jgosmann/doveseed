@@ -5,13 +5,13 @@ from typing import cast, Dict, List, Optional
 
 import pytest
 
-from pushmail.registration import (
+from doveseed.registration import (
     ConfirmationRequester,
     Registration,
     RegistrationService,
     UnauthorizedException,
 )
-from pushmail.types import Email, Token, State, Action
+from doveseed.types import Email, Token, State, Action
 
 
 class InMemoryStorage:

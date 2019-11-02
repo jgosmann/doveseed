@@ -1,8 +1,8 @@
 from email.message import EmailMessage
 from unittest.mock import MagicMock
 
-from pushmail.confirmation import EmailConfirmationRequester
-from pushmail.types import Email, Token, Action
+from doveseed.confirmation import EmailConfirmationRequester
+from doveseed.types import Email, Token, Action
 
 
 def test_email_confirmation_requester():

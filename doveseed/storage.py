@@ -8,7 +8,7 @@ from typing import Optional, Union
 from tinydb import TinyDB, Query
 
 from .registration import Registration
-from pushmail.types import Email
+from doveseed.types import Email
 
 
 class TinyDbStorage:

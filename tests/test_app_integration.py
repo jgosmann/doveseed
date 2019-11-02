@@ -6,8 +6,8 @@ import pytest
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
-from pushmail.app import create_app
-from pushmail.types import Email, Token, Action
+from doveseed.app import create_app
+from doveseed.types import Email, Token, Action
 
 
 class ConfirmationRequester:

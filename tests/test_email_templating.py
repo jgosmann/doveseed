@@ -5,8 +5,8 @@ from urllib.parse import quote
 from jinja2 import BaseLoader
 import pytest
 
-from pushmail.email_templating import EmailFromTemplateProvider
-from pushmail.types import Email, Token, Action
+from doveseed.email_templating import EmailFromTemplateProvider
+from doveseed.types import Email, Token, Action
 
 
 class MockTemplateLoader(BaseLoader):

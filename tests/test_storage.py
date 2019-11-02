@@ -4,9 +4,9 @@ import pytest
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
-from pushmail.registration import Registration
-from pushmail.types import Email, Token, State, Action
-from pushmail.storage import TinyDbStorage
+from doveseed.registration import Registration
+from doveseed.types import Email, Token, State, Action
+from doveseed.storage import TinyDbStorage
 
 
 @pytest.fixture

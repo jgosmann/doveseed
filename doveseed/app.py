@@ -7,7 +7,7 @@ from flask import Flask, request
 from tinydb import TinyDB
 
 from .registration import RegistrationService, UnauthorizedException
-from pushmail.types import Email, Token
+from doveseed.types import Email, Token
 from .storage import TinyDbStorage
 from .token_gen import gen_secure_token
 
@@ -43,7 +43,7 @@ def create_app(
         except (KeyError, ValueError):
             raise UnauthorizedException("Improper Authorization header.")
 
-    app = Flask("pushmail")
+    app = Flask("doveseed")
 
     @app.route("/subscribe/<email>", methods=["POST"])
     def subscribe(email: str):

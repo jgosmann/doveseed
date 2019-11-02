@@ -11,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 from typing_extensions import Protocol
 
 from .smtp import ConnectionManager
-from pushmail.types import Email, Token, Action
+from doveseed.types import Email, Token, Action
 
 
 class EmailMessageProvider(Protocol):

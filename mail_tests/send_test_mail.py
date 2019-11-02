@@ -7,9 +7,9 @@ import sys
 
 from jinja2 import FileSystemLoader
 
-from pushmail.smtp import smtp_connection
-from pushmail.email_templating import EmailFromTemplateProvider, FileSystemBinaryLoader
-from pushmail.types import Email, Token, Action
+from doveseed.smtp import smtp_connection
+from doveseed.email_templating import EmailFromTemplateProvider, FileSystemBinaryLoader
+from doveseed.types import Email, Token, Action
 
 parser = argparse.ArgumentParser(
     description="Generate and send test emails from a template."
@@ -62,9 +62,9 @@ if __name__ == "__main__":
     conn = smtp_connection(args.host[0], user, getpass.getpass(f"Password for {user}:"))
 
     settings = EmailFromTemplateProvider.Settings(
-        display_name="Pushmail template test",
+        display_name="Doveseed template test",
         sender=args.from_mail[0],
-        host="pushmail.local",
+        host="doveseed.local",
         confirm_url_format="https://{host}/confirm/{email}?token={token}",
     )
     message_provider = EmailFromTemplateProvider(

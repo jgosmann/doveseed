@@ -23,7 +23,7 @@ class EmailMessageProvider(Protocol):
 
 class EmailConfirmationRequester:
     def __init__(
-        self, connection: ConnectionManager, message_provider: EmailMessageProvider
+        self, *, connection: ConnectionManager, message_provider: EmailMessageProvider
     ):
         self._connection = connection
         self._message_provider = message_provider

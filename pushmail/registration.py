@@ -4,12 +4,12 @@ from typing import Callable, Iterator, Optional
 
 from typing_extensions import Protocol
 
-from pushmail.types import EMail, Token, State, Action
+from pushmail.types import Email, Token, State, Action
 
 
 @dataclass
 class Registration:
-    email: EMail
+    email: Email
     last_update: datetime
     state: State
     confirm_token: Optional[Token] = None
@@ -21,16 +21,16 @@ class Storage(Protocol):
     def upsert(self, registration: Registration) -> None:
         ...
 
-    def find(self, email: EMail) -> Optional[Registration]:
+    def find(self, email: Email) -> Optional[Registration]:
         ...
 
-    def delete(self, email: EMail) -> None:
+    def delete(self, email: Email) -> None:
         ...
 
 
 class ConfirmationRequester(Protocol):
     def request_confirmation(
-        self, email: EMail, *, action: Action, confirm_token: Token
+        self, email: Email, *, action: Action, confirm_token: Token
     ) -> None:
         ...
 
@@ -49,7 +49,7 @@ class RegistrationService:
         self._token_generator = token_generator
         self._utcnow = utcnow
 
-    def subscribe(self, email: EMail):
+    def subscribe(self, email: Email):
         registration = self._storage.find(email)
         if registration is None:
             registration = Registration(
@@ -66,7 +66,7 @@ class RegistrationService:
 
             self._perform_state_change_requiring_confirmation(registration)
 
-    def unsubscribe(self, email: EMail):
+    def unsubscribe(self, email: Email):
         registration = self._storage.find(email)
         subscribed_states = (State.subscribed, State.pending_unsubscribe)
         if registration is not None and registration.state in subscribed_states:
@@ -76,7 +76,7 @@ class RegistrationService:
             registration.confirm_action = Action.unsubscribe
             self._perform_state_change_requiring_confirmation(registration)
 
-    def confirm(self, email: EMail, token: Token):
+    def confirm(self, email: Email, token: Token):
         registration = self._storage.find(email)
 
         if (

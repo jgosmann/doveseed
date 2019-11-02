@@ -6,7 +6,7 @@ from jinja2 import BaseLoader
 import pytest
 
 from pushmail.email_templating import EmailFromTemplateProvider
-from pushmail.types import EMail, Token, Action
+from pushmail.types import Email, Token, Action
 
 
 class MockTemplateLoader(BaseLoader):
@@ -38,7 +38,7 @@ def settings():
 class TestGetConfirmationRequestMsg:
     @pytest.mark.parametrize("action", (Action.subscribe, Action.unsubscribe))
     def test_constructs_email_message_from_templates(self, action, settings):
-        to_email = EMail("to.email@test.org")
+        to_email = Email("to.email@test.org")
         subject = "subject"
         plain_text = "plain text"
         html = "html"
@@ -79,7 +79,7 @@ class TestGetConfirmationRequestMsg:
             binary_loader=MockBinaryLoader(dict()),
         )
         msg = provider.get_confirmation_request_msg(
-            EMail("email@local"), action=Action.subscribe, confirm_token=token
+            Email("email@local"), action=Action.subscribe, confirm_token=token
         )
 
         expected_link = "https://test.local/confirm/email%40local?token=" + quote(
@@ -108,7 +108,7 @@ class TestGetConfirmationRequestMsg:
             binary_loader=MockBinaryLoader(dict()),
         )
         msg = provider.get_confirmation_request_msg(
-            EMail("email"), action=Action.subscribe, confirm_token=Token(b"token")
+            Email("email"), action=Action.subscribe, confirm_token=Token(b"token")
         )
 
         assert msg["Subject"] == f"{settings.display_name} {settings.host} email"
@@ -129,7 +129,7 @@ class TestGetConfirmationRequestMsg:
             binary_loader=MockBinaryLoader(dict()),
         )
         msg = provider.get_confirmation_request_msg(
-            EMail("email"), action=Action.subscribe, confirm_token=Token(b"token")
+            Email("email"), action=Action.subscribe, confirm_token=Token(b"token")
         )
 
         assert (
@@ -152,7 +152,7 @@ class TestGetConfirmationRequestMsg:
             binary_loader=MockBinaryLoader({"bin": binary_content}),
         )
         msg = provider.get_confirmation_request_msg(
-            EMail("email"), action=Action.subscribe, confirm_token=Token(b"token")
+            Email("email"), action=Action.subscribe, confirm_token=Token(b"token")
         )
 
         assert msg["Subject"] == b64encode(binary_content).decode("ascii")

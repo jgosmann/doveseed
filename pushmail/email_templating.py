@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 from jinja2 import Environment
 
-from pushmail.types import EMail, Token, Action
+from pushmail.types import Email, Token, Action
 
 
 class FileSystemBinaryLoader:
@@ -33,7 +33,7 @@ class EmailFromTemplateProvider:
         self._env.globals["include_binary"] = binary_loader.load
 
     def get_confirmation_request_msg(
-        self, to_email: EMail, *, action: Action, confirm_token: Token
+        self, to_email: Email, *, action: Action, confirm_token: Token
     ) -> EmailMessage:
         encoded_token = quote(b64encode(confirm_token).decode("ascii"))
         confirm_link = self.settings.confirm_url_format.format(

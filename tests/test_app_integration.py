@@ -7,15 +7,15 @@ from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
 from pushmail.app import create_app
-from pushmail.types import EMail, Token, Action
+from pushmail.types import Email, Token, Action
 
 
 class ConfirmationRequester:
     def __init__(self):
-        self.tokens: Dict[EMail, str] = {}
+        self.tokens: Dict[Email, str] = {}
 
     def request_confirmation(
-        self, email: EMail, *, action: Action, confirm_token: Token
+        self, email: Email, *, action: Action, confirm_token: Token
     ):
         self.tokens[email] = b64encode(confirm_token).decode("ascii")
 
@@ -42,7 +42,7 @@ def client(db, confirmation_requester):
 
 
 def test_subscription_and_unsubscription_flow(client, db, confirmation_requester):
-    given_email = EMail("foo@test.org")
+    given_email = Email("foo@test.org")
     assert_success(client.post(f"/subscribe/{given_email}"))
     assert_success(
         client.post(
@@ -75,7 +75,7 @@ def test_subscription_and_unsubscription_flow(client, db, confirmation_requester
 
 
 def test_confirm_unauthorized(client, db, confirmation_requester):
-    given_email = EMail("foo@test.org")
+    given_email = Email("foo@test.org")
     assert_success(client.post(f"/subscribe/{given_email}"))
 
     unknown_email_response = client.post(

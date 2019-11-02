@@ -9,7 +9,7 @@ from jinja2 import FileSystemLoader
 
 from pushmail.smtp import smtp_connection
 from pushmail.email_templating import EmailFromTemplateProvider, FileSystemBinaryLoader
-from pushmail.types import EMail, Token, Action
+from pushmail.types import Email, Token, Action
 
 parser = argparse.ArgumentParser(
     description="Generate and send test emails from a template."

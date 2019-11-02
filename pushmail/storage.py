@@ -8,7 +8,7 @@ from typing import Optional, Union
 from tinydb import TinyDB, Query
 
 from .registration import Registration
-from pushmail.types import EMail
+from pushmail.types import Email
 
 
 class TinyDbStorage:
@@ -26,7 +26,7 @@ class TinyDbStorage:
                 data[k] = value.name
         self._tinydb.upsert(data, Query().email == registration.email)
 
-    def find(self, email: EMail) -> Optional[Registration]:
+    def find(self, email: Email) -> Optional[Registration]:
         data = self._tinydb.get(Query().email == email)
         if data is None:
             return None
@@ -50,5 +50,5 @@ class TinyDbStorage:
 
         return Registration(**data)
 
-    def delete(self, email: EMail) -> None:
+    def delete(self, email: Email) -> None:
         self._tinydb.remove(Query().email == email)

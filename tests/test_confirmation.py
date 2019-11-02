@@ -2,11 +2,11 @@ from email.message import EmailMessage
 from unittest.mock import MagicMock
 
 from pushmail.confirmation import EmailConfirmationRequester
-from pushmail.types import EMail, Token, Action
+from pushmail.types import Email, Token, Action
 
 
 def test_email_confirmation_requester():
-    email = EMail("email")
+    email = Email("email")
     action = Action.subscribe
     confirm_token = Token(b"token")
     message = EmailMessage()

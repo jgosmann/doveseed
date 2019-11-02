@@ -11,22 +11,22 @@ from pushmail.registration import (
     RegistrationService,
     UnauthorizedException,
 )
-from pushmail.types import EMail, Token, State, Action
+from pushmail.types import Email, Token, State, Action
 
 
 class InMemoryStorage:
     def __init__(self):
-        self.data: Dict[EMail, Registration] = {}
+        self.data: Dict[Email, Registration] = {}
 
     def upsert(self, registration: Registration):
         self.data[registration.email] = registration
 
-    def find(self, email: EMail) -> Optional[Registration]:
+    def find(self, email: Email) -> Optional[Registration]:
         if email in self.data:
             return self.data[email]
         return None
 
-    def delete(self, email: EMail) -> None:
+    def delete(self, email: Email) -> None:
         del self.data[email]
 
 
@@ -86,7 +86,7 @@ class TestRegistrationServiceSubscribe:
     def test_if_email_unknown_creates_registration(
         self, registration_service, storage, token_generator, utcnow
     ):
-        given_email = EMail("new@test.org")
+        given_email = Email("new@test.org")
         registration_service.subscribe(given_email)
         stored = storage.find(given_email)
         assert stored == Registration(
@@ -101,7 +101,7 @@ class TestRegistrationServiceSubscribe:
     def test_if_email_unknown_sends_subscription_confirm_mail(
         self, registration_service, confirmation_requester, token_generator, utcnow
     ):
-        given_email = EMail("new@test.org")
+        given_email = Email("new@test.org")
         registration_service.subscribe(given_email)
         confirmation_requester.request_confirmation.assert_called_with(
             given_email,
@@ -112,7 +112,7 @@ class TestRegistrationServiceSubscribe:
     def test_if_subscription_is_pending_bumps_last_update(
         self, registration_service, storage, token_generator, utcnow
     ):
-        given_email = EMail("pending@test.org")
+        given_email = Email("pending@test.org")
         storage.upsert(
             Registration(
                 email=given_email,
@@ -143,7 +143,7 @@ class TestRegistrationServiceSubscribe:
         token_generator,
         utcnow,
     ):
-        given_email = EMail("pending@test.org")
+        given_email = Email("pending@test.org")
         storage.upsert(
             Registration(
                 email=given_email,
@@ -172,7 +172,7 @@ class TestRegistrationServiceSubscribe:
         token_generator,
         utcnow,
     ):
-        given_email = EMail("subscribed@test.org")
+        given_email = Email("subscribed@test.org")
         storage.upsert(
             Registration(
                 email=given_email,
@@ -198,14 +198,14 @@ class TestRegistrationServiceUnsubscribe:
     def test_if_email_is_unkown_has_no_effect(
         self, registration_service, confirmation_requester
     ):
-        given_email = EMail("unkown@test.org")
+        given_email = Email("unkown@test.org")
         registration_service.unsubscribe(given_email)
         assert not confirmation_requester.request_confirmation.called
 
     def test_if_subscription_pending_has_no_effect(
         self, registration_service, storage, confirmation_requester, utcnow
     ):
-        given_email = EMail("pending@test.org")
+        given_email = Email("pending@test.org")
         storage.upsert(
             Registration(
                 email=given_email,
@@ -232,7 +232,7 @@ class TestRegistrationServiceUnsubscribe:
     def test_if_subscribed_sets_registration_to_pending_unsubscribe(
         self, state, registration_service, storage, token_generator, utcnow
     ):
-        given_email = EMail("subscribed@test.org")
+        given_email = Email("subscribed@test.org")
         storage.upsert(
             Registration(
                 email=given_email, state=state, last_update=utcnow() - timedelta(days=1)
@@ -260,7 +260,7 @@ class TestRegistrationServiceUnsubscribe:
         token_generator,
         utcnow,
     ):
-        given_email = EMail("subscribed@test.org")
+        given_email = Email("subscribed@test.org")
         storage.upsert(
             Registration(
                 email=given_email, state=state, last_update=utcnow() - timedelta(days=1)
@@ -280,7 +280,7 @@ class TestRegistrationServiceConfirm:
     def test_confirm_with_valid_token_activates_subscription(
         self, registration_service, storage, utcnow
     ):
-        given_email = EMail("pending@test.org")
+        given_email = Email("pending@test.org")
         given_token = Token(b"token")
         storage.upsert(
             Registration(
@@ -306,7 +306,7 @@ class TestRegistrationServiceConfirm:
     def test_confirm_with_valid_token_removes_subscription(
         self, registration_service, storage, utcnow
     ):
-        given_email = EMail("pending@test.org")
+        given_email = Email("pending@test.org")
         given_token = Token(b"token")
         storage.upsert(
             Registration(
@@ -328,7 +328,7 @@ class TestRegistrationServiceConfirm:
     def test_confirm_with_invalid_token_raises_exception(
         self, state, registration_service, storage, utcnow
     ):
-        given_email = EMail("pending@test.org")
+        given_email = Email("pending@test.org")
         storage.upsert(
             Registration(
                 email=given_email,
@@ -345,7 +345,7 @@ class TestRegistrationServiceConfirm:
             registration_service.confirm(given_email, Token(b"invalid token"))
 
     def test_confirm_for_unknown_email_raises_exception(self, registration_service):
-        given_email = EMail("pending@test.org")
+        given_email = Email("pending@test.org")
 
         with pytest.raises(UnauthorizedException):
             registration_service.confirm(given_email, Token(b"token"))
@@ -353,7 +353,7 @@ class TestRegistrationServiceConfirm:
     def test_confirm_for_registration_without_confirm_action_raises_exception(
         self, registration_service, storage, utcnow
     ):
-        given_email = EMail("subscribed@test.org")
+        given_email = Email("subscribed@test.org")
         storage.upsert(
             Registration(
                 email=given_email,

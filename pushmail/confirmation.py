@@ -11,12 +11,12 @@ from jinja2 import Environment, FileSystemLoader, Template
 from typing_extensions import Protocol
 
 from .smtp import ConnectionManager
-from pushmail.types import EMail, Token, Action
+from pushmail.types import Email, Token, Action
 
 
 class EmailMessageProvider(Protocol):
     def get_confirmation_request_msg(
-        self, to_email: EMail, *, action: Action, confirm_token: Token
+        self, to_email: Email, *, action: Action, confirm_token: Token
     ) -> EmailMessage:
         ...
 
@@ -29,7 +29,7 @@ class EmailConfirmationRequester:
         self._message_provider = message_provider
 
     def request_confirmation(
-        self, email: EMail, *, action: Action, confirm_token: Token
+        self, email: Email, *, action: Action, confirm_token: Token
     ) -> None:
         message = self._message_provider.get_confirmation_request_msg(
             email, action=action, confirm_token=confirm_token

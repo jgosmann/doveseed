@@ -5,7 +5,7 @@ from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
 from pushmail.registration import Registration
-from pushmail.types import EMail, Token, State, Action
+from pushmail.types import Email, Token, State, Action
 from pushmail.storage import TinyDbStorage
 
 
@@ -23,7 +23,7 @@ class TestTinyDbStorage:
     def test_upsert_of_new_entity(self, tiny_db, tiny_db_storage):
         last_update = datetime(2019, 10, 25, 13, 37)
         registration = Registration(
-            email=EMail("mail@test.org"),
+            email=Email("mail@test.org"),
             last_update=last_update,
             state=State.subscribed,
         )
@@ -42,7 +42,7 @@ class TestTinyDbStorage:
     def test_upsert_of_existing_entity(self, tiny_db, tiny_db_storage):
         first_update = datetime(2019, 10, 25, 13, 37)
         registration = Registration(
-            email=EMail("mail@test.org"),
+            email=Email("mail@test.org"),
             last_update=first_update,
             state=State.subscribed,
         )
@@ -63,7 +63,7 @@ class TestTinyDbStorage:
         }
 
     def test_find_of_non_exsting_entity_returns_none(self, tiny_db_storage):
-        assert tiny_db_storage.find(EMail("unknown@test.org")) is None
+        assert tiny_db_storage.find(Email("unknown@test.org")) is None
 
     def test_find_returns_matching_entity(self, tiny_db, tiny_db_storage):
         last_update = datetime(2019, 10, 25, 13, 37)
@@ -78,8 +78,8 @@ class TestTinyDbStorage:
             }
         )
 
-        assert tiny_db_storage.find(EMail("mail@test.org")) == Registration(
-            email=EMail("mail@test.org"),
+        assert tiny_db_storage.find(Email("mail@test.org")) == Registration(
+            email=Email("mail@test.org"),
             last_update=last_update,
             state=State.subscribed,
         )
@@ -96,19 +96,19 @@ class TestTinyDbStorage:
             }
         )
 
-        tiny_db_storage.delete(EMail("mail@test.org"))
+        tiny_db_storage.delete(Email("mail@test.org"))
 
         assert tiny_db.get(Query().email == "mail@test.org") is None
 
     def test_delete_non_existing_entity(self, tiny_db, tiny_db_storage):
-        tiny_db_storage.delete(EMail("mail@test.org"))
+        tiny_db_storage.delete(Email("mail@test.org"))
         assert tiny_db.get(Query().email == "mail@test.org") is None
 
     @pytest.mark.parametrize(
         "instance",
         (
             Registration(
-                email=EMail("mail@test.org"),
+                email=Email("mail@test.org"),
                 last_update=datetime(2019, 10, 25, 13, 37),
                 state=State.subscribed,
                 confirm_action=None,
@@ -116,7 +116,7 @@ class TestTinyDbStorage:
                 immediate_unsubscribe_token=None,
             ),
             Registration(
-                email=EMail("mail2@test.org"),
+                email=Email("mail2@test.org"),
                 last_update=datetime(2019, 10, 25, 13, 38),
                 state=State.pending_subscribe,
                 confirm_action=Action.subscribe,

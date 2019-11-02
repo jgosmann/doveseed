@@ -7,7 +7,7 @@ from flask import Flask, request
 from tinydb import TinyDB
 
 from .registration import RegistrationService, UnauthorizedException
-from pushmail.types import EMail, Token
+from pushmail.types import Email, Token
 from .storage import TinyDbStorage
 from .token_gen import gen_secure_token
 
@@ -47,19 +47,19 @@ def create_app(
 
     @app.route("/subscribe/<email>", methods=["POST"])
     def subscribe(email: str):
-        registration_service.subscribe(EMail(email))
+        registration_service.subscribe(Email(email))
         return "", http.HTTPStatus.NO_CONTENT
 
     @app.route("/unsubscribe/<email>", methods=["POST"])
     def unsubscribe(email: str):
-        registration_service.unsubscribe(EMail(email))
+        registration_service.unsubscribe(Email(email))
         return "", http.HTTPStatus.NO_CONTENT
 
     @app.route("/confirm/<email>", methods=["POST"])
     def confirm(email: str):
         try:
             token = require_bearer_token()
-            registration_service.confirm(EMail(email), token)
+            registration_service.confirm(Email(email), token)
             return "", http.HTTPStatus.NO_CONTENT
         except UnauthorizedException as err:
             return (

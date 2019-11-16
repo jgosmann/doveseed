@@ -6,7 +6,7 @@ from jinja2 import BaseLoader
 import pytest
 
 from doveseed.email_templating import EmailFromTemplateProvider
-from doveseed.types import Email, Token, Action
+from doveseed.domain_types import Email, Token, Action
 
 
 class MockTemplateLoader(BaseLoader):

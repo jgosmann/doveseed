@@ -1,6 +1,6 @@
 import os
 
-from doveseed.types import Token
+from .domain_types import Token
 
 
 def gen_secure_token():

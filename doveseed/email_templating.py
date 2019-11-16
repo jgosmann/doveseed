@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 from jinja2 import Environment
 
-from doveseed.types import Email, Token, Action
+from .domain_types import Email, Token, Action
 
 
 class FileSystemBinaryLoader:

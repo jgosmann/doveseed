@@ -4,8 +4,8 @@ import pytest
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
+from doveseed.domain_types import Email, Token, State, Action
 from doveseed.registration import Registration
-from doveseed.types import Email, Token, State, Action
 from doveseed.storage import TinyDbStorage
 
 
@@ -128,3 +128,49 @@ class TestTinyDbStorage:
     def test_roundtrip(self, instance, tiny_db_storage):
         tiny_db_storage.upsert(instance)
         assert tiny_db_storage.find(instance.email) == instance
+
+    def test_drop_old_unconfirmed(self, tiny_db_storage):
+        reference_datetime = datetime(2019, 10, 25, 13, 18)
+        fresh = (
+            Registration(
+                email=Email("mail1@test.org"),
+                last_update=reference_datetime - timedelta(days=1),
+                state=State.pending_subscribe,
+                confirm_action=Action.subscribe,
+                confirm_token=Token(b"token"),
+                immediate_unsubscribe_token=Token(b"another token"),
+            ),
+            Registration(
+                email=Email("mail2@test.org"),
+                last_update=reference_datetime - timedelta(days=3),
+                state=State.subscribed,
+                immediate_unsubscribe_token=Token(b"another token"),
+            ),
+            Registration(
+                email=Email("mail3@test.org"),
+                last_update=reference_datetime - timedelta(days=3),
+                state=State.pending_unsubscribe,
+                confirm_action=Action.unsubscribe,
+                confirm_token=Token(b"token"),
+                immediate_unsubscribe_token=Token(b"another token"),
+            ),
+        )
+        old = (
+            Registration(
+                email=Email("mail4@test.org"),
+                last_update=reference_datetime - timedelta(days=3),
+                state=State.pending_subscribe,
+                confirm_action=Action.subscribe,
+                confirm_token=Token(b"token"),
+                immediate_unsubscribe_token=Token(b"another token"),
+            ),
+        )
+
+        for r in fresh + old:
+            tiny_db_storage.upsert(r)
+
+        tiny_db_storage.drop_old_unconfirmed(
+            drop_before=reference_datetime - timedelta(days=2)
+        )
+
+        assert tuple(sorted(tiny_db_storage.all(), key=lambda r: r.email)) == fresh

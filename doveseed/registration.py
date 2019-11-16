@@ -5,7 +5,7 @@ from typing import Callable, Iterator, Optional
 
 from typing_extensions import Protocol
 
-from doveseed.types import Email, Token, State, Action
+from .domain_types import Email, Token, State, Action
 
 
 @dataclass

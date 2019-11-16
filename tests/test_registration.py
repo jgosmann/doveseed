@@ -11,7 +11,7 @@ from doveseed.registration import (
     RegistrationService,
     UnauthorizedException,
 )
-from doveseed.types import Email, Token, State, Action
+from doveseed.domain_types import Email, Token, State, Action
 
 
 class InMemoryStorage:

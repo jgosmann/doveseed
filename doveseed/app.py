@@ -17,7 +17,7 @@ from .registration import (
 from .smtp import smtp_connection
 from .storage import TinyDbStorage
 from .token_gen import gen_secure_token
-from .types import Email, Token
+from .domain_types import Email, Token
 
 
 def create_app_from_config(config_filename: str) -> Flask:

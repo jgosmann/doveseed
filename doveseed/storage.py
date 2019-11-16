@@ -8,13 +8,18 @@ from typing import Any, Dict, Optional, Type, Union
 
 from tinydb import TinyDB, Query
 
+from .domain_types import Email, State
 from .registration import Registration
-from .types import Email
 
 
 class TinyDbStorage:
     def __init__(self, tinydb: TinyDB):
         self._tinydb = tinydb
+
+    def all(self):
+        for data in self._tinydb.all():
+            self._deserialize_in_place(Registration, data)
+            yield Registration(**data)
 
     def upsert(self, registration: Registration) -> None:
         data = asdict(registration)
@@ -62,3 +67,11 @@ class TinyDbStorage:
 
     def delete(self, email: Email) -> None:
         self._tinydb.remove(Query().email == email)
+
+    def drop_old_unconfirmed(self, *, drop_before: datetime):
+        is_before = lambda v: datetime.fromisoformat(v) < drop_before
+        registration = Query()
+        self._tinydb.remove(
+            registration.last_update.test(is_before)
+            & (registration.state == State.pending_subscribe.name)
+        )

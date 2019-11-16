@@ -6,7 +6,7 @@ from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
 from doveseed.app import create_app_from_instances
-from doveseed.types import Email, Token, Action
+from doveseed.domain_types import Email, Token, Action
 
 
 class ConfirmationRequester:

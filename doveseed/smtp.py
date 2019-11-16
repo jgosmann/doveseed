@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from email.message import EmailMessage
 from smtplib import SMTP
+import ssl
 from typing import Callable, ContextManager
 
 
@@ -16,10 +17,13 @@ ConnectionManager = Callable[[], ContextManager[_EstablishedSmtpConnection]]
 
 
 def smtp_connection(host: str, user: str, password: str) -> ConnectionManager:
+    context = ssl.create_default_context()
+    context.check_hostname = True
+
     @contextmanager
     def connection_manager():
         with SMTP(host) as smtp:
-            smtp.starttls()
+            smtp.starttls(context=context)
             smtp.login(user, password)
             yield _EstablishedSmtpConnection(smtp)
 

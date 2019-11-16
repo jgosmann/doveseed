@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from email.utils import getaddresses
 from typing import Callable, Iterator, Optional
 
 from typing_extensions import Protocol
@@ -50,6 +51,7 @@ class RegistrationService:
         self._utcnow = utcnow
 
     def subscribe(self, email: Email):
+        self._check_email(email)
         registration = self._storage.find(email)
         if registration is None:
             registration = Registration(
@@ -67,6 +69,7 @@ class RegistrationService:
             self._perform_state_change_requiring_confirmation(registration)
 
     def unsubscribe(self, email: Email):
+        self._check_email(email)
         registration = self._storage.find(email)
         subscribed_states = (State.subscribed, State.pending_unsubscribe)
         if registration is not None and registration.state in subscribed_states:
@@ -102,6 +105,11 @@ class RegistrationService:
             action=registration.confirm_action,
             confirm_token=registration.confirm_token,
         )
+
+    def _check_email(self, email: Email):
+        addresses = getaddresses([email])
+        if len(addresses) != 1 or addresses[0][1] != email:
+            raise ValueError("Must provide exactly one valid email address.")
 
 
 class UnauthorizedException(Exception):

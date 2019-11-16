@@ -193,6 +193,20 @@ class TestRegistrationServiceSubscribe:
             immediate_unsubscribe_token=Token(b"token"),
         )
 
+    def test_fails_when_trying_to_subscribe_multiple_email_addresses(
+        self, registration_service
+    ):
+        given_email = Email("new@test.org, additional@test.org")
+        with pytest.raises(ValueError):
+            registration_service.subscribe(given_email)
+
+    def test_fails_when_trying_to_subscribe_invalid_email_address(
+        self, registration_service
+    ):
+        given_email = Email("new@not valid.org")
+        with pytest.raises(ValueError):
+            registration_service.subscribe(given_email)
+
 
 class TestRegistrationServiceUnsubscribe:
     def test_if_email_is_unkown_has_no_effect(
@@ -274,6 +288,20 @@ class TestRegistrationServiceUnsubscribe:
             action=Action.unsubscribe,
             confirm_token=token_generator.generated_tokens[0],
         )
+
+    def test_fails_when_trying_to_unsubscribe_multiple_email_addresses(
+        self, registration_service
+    ):
+        given_email = Email("new@test.org, additional@test.org")
+        with pytest.raises(ValueError):
+            registration_service.unsubscribe(given_email)
+
+    def test_fails_when_trying_to_unsubscribe_invalid_email_address(
+        self, registration_service
+    ):
+        given_email = Email("new@not valid.org")
+        with pytest.raises(ValueError):
+            registration_service.unsubscribe(given_email)
 
 
 class TestRegistrationServiceConfirm:

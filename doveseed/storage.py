@@ -75,3 +75,16 @@ class TinyDbStorage:
             registration.last_update.test(is_before)
             & (registration.state == State.pending_subscribe.name)
         )
+
+    def get_last_seen(self):
+        try:
+            return datetime.fromisoformat(
+                self._tinydb.get(Query().key == "last_seen")["value"]
+            )
+        except (KeyError, TypeError):
+            return None
+
+    def set_last_seen(self, value: datetime):
+        self._tinydb.upsert(
+            {"key": "last_seen", "value": value.isoformat()}, Query().key == "last_seen"
+        )

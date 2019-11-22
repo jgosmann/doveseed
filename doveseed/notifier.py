@@ -1,20 +1,13 @@
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable
+from typing import Iterable, Optional
 
 from typing_extensions import Protocol
 
-
-@dataclass
-class FeedItem:
-    title: str
-    link: str
-    pub_date: datetime
-    description: str
+from .domain_types import FeedItem
 
 
 class Storage(Protocol):
-    def get_last_seen(self) -> datetime:
+    def get_last_seen(self) -> Optional[datetime]:
         ...
 
     def set_last_seen(self, value: datetime) -> None:
@@ -44,5 +37,7 @@ class NewPostNotifier:
         for item in chronological:
             self._consumer(item)
 
-    def _select_new_posts(self, feed: Feed, cutoff: datetime):
+    def _select_new_posts(self, feed: Feed, cutoff: Optional[datetime]):
+        if cutoff is None:
+            return feed
         return (item for item in feed if item.pub_date > cutoff)

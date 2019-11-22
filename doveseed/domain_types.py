@@ -1,4 +1,5 @@
 from base64 import b64encode, b64decode
+from datetime import datetime
 
 from dataclasses import dataclass
 from enum import Enum
@@ -9,6 +10,14 @@ State = Enum("State", ("pending_subscribe", "subscribed", "pending_unsubscribe")
 Action = Enum("Action", ("subscribe", "unsubscribe"))
 
 _T = TypeVar("_T", bound="Token")
+
+
+@dataclass
+class FeedItem:
+    title: str
+    link: str
+    pub_date: datetime
+    description: str
 
 
 @dataclass

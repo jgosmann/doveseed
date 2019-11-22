@@ -174,3 +174,11 @@ class TestTinyDbStorage:
         )
 
         assert tuple(sorted(tiny_db_storage.all(), key=lambda r: r.email)) == fresh
+
+    def test_get_unset_last_seen_storage(self, tiny_db_storage):
+        assert tiny_db_storage.get_last_seen() is None
+
+    def test_last_ssen_storage(self, tiny_db_storage):
+        now = datetime.utcnow()
+        tiny_db_storage.set_last_seen(now)
+        assert tiny_db_storage.get_last_seen() == now

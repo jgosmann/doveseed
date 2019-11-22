@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 from jinja2 import Environment
 
-from .domain_types import Email, Token, Action
+from .domain_types import Action, Email, FeedItem, Token
 
 
 class FileSystemBinaryLoader:
@@ -63,5 +63,29 @@ class EmailFromTemplateProvider:
         msg["Subject"] = subject
         msg["From"] = self.settings.sender
         msg["To"] = to_email
+
+        return msg
+
+    def get_new_post_msg(self, feed_item: FeedItem, to_email: Email) -> EmailMessage:
+        substitutions = dict(
+            display_name=self.settings.display_name,
+            host=self.settings.host,
+            to_email=to_email,
+            post=feed_item,
+        )
+
+        subject = self._env.get_template(f"new-post.subject.txt").render(
+            **substitutions
+        )
+        substitutions["subject"] = subject
+
+        plain_text = self._env.get_template(f"new-post.txt").render(**substitutions)
+        html = self._env.get_template(f"new-post.html").render(**substitutions)
+
+        msg = EmailMessage()
+        msg.set_content(plain_text)
+        msg.add_alternative(html, subtype="html")
+        msg["Subject"] = subject
+        msg["From"] = self.settings.sender
 
         return msg

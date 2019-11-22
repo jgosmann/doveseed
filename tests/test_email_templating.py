@@ -1,4 +1,5 @@
 from base64 import b64encode
+from datetime import datetime
 from typing import Dict
 from urllib.parse import quote
 
@@ -6,7 +7,7 @@ from jinja2 import BaseLoader
 import pytest
 
 from doveseed.email_templating import EmailFromTemplateProvider
-from doveseed.domain_types import Email, Token, Action
+from doveseed.domain_types import Action, Email, FeedItem, Token
 
 
 class MockTemplateLoader(BaseLoader):
@@ -32,6 +33,16 @@ def settings():
         sender="sender <sender@test.org>",
         host="test.local",
         confirm_url_format="https://{host}/confirm/{email}?token={token}",
+    )
+
+
+@pytest.fixture
+def feed_item():
+    return FeedItem(
+        title="title",
+        link="link",
+        pub_date=datetime(2019, 11, 22),
+        description="description",
     )
 
 
@@ -154,5 +165,88 @@ class TestGetConfirmationRequestMsg:
         msg = provider.get_confirmation_request_msg(
             Email("email"), action=Action.subscribe, confirm_token=Token(b"token")
         )
+
+        assert msg["Subject"] == b64encode(binary_content).decode("ascii")
+
+
+class TestGetNewPostMsg:
+    def test_constructs_email_message_from_templates(self, feed_item, settings):
+        to_email = Email("to.email@test.org")
+        subject = "subject"
+        plain_text = "plain text"
+        html = "html"
+
+        provider = EmailFromTemplateProvider(
+            settings=settings,
+            template_loader=MockTemplateLoader(
+                {
+                    f"new-post.subject.txt": subject,
+                    f"new-post.txt": plain_text,
+                    f"new-post.html": html,
+                }
+            ),
+            binary_loader=MockBinaryLoader(dict()),
+        )
+        msg = provider.get_new_post_msg(feed_item, Email("email"))
+
+        assert msg["Subject"] == subject
+        assert msg.get_body("plain").get_content().strip() == plain_text  # type: ignore
+        assert msg.get_body("html").get_content().strip() == html  # type: ignore
+
+    def test_subject_substitutions(self, feed_item, settings):
+        subject = "{{display_name}} {{host}} {{to_email}} {{post.title}}"
+
+        provider = EmailFromTemplateProvider(
+            settings=settings,
+            template_loader=MockTemplateLoader(
+                {
+                    "new-post.subject.txt": subject,
+                    "new-post.txt": "",
+                    "new-post.html": "",
+                }
+            ),
+            binary_loader=MockBinaryLoader(dict()),
+        )
+        msg = provider.get_new_post_msg(feed_item, Email("email"))
+
+        assert msg["Subject"] == f"{settings.display_name} {settings.host} email title"
+
+    def test_body_substitutions(self, feed_item, settings):
+        subject = "subject"
+        template = "{{subject}} {{display_name}} {{host}} {{to_email}} {{post.title}}"
+
+        provider = EmailFromTemplateProvider(
+            settings=settings,
+            template_loader=MockTemplateLoader(
+                {
+                    "new-post.subject.txt": subject,
+                    "new-post.txt": template,
+                    "new-post.html": template,
+                }
+            ),
+            binary_loader=MockBinaryLoader(dict()),
+        )
+        msg = provider.get_new_post_msg(feed_item, Email("email"))
+
+        assert (
+            msg.get_body("plain").get_content().strip()  # type: ignore
+            == f"{subject} {settings.display_name} {settings.host} email title"
+        )
+
+    def test_include_binary_and_b64encode(self, feed_item, settings):
+        binary_content = b"binary content"
+        subject = "{{ include_binary('bin') | b64encode }}"
+        provider = EmailFromTemplateProvider(
+            settings=settings,
+            template_loader=MockTemplateLoader(
+                {
+                    f"new-post.subject.txt": subject,
+                    "new-post.txt": "",
+                    "new-post.html": "",
+                }
+            ),
+            binary_loader=MockBinaryLoader({"bin": binary_content}),
+        )
+        msg = provider.get_new_post_msg(feed_item, Email("email"))
 
         assert msg["Subject"] == b64encode(binary_content).decode("ascii")

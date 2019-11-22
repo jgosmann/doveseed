@@ -38,7 +38,10 @@ class NewPostNotifier:
         cutoff = self._storage.get_last_seen()
         feed = list(feed)
         self._storage.set_last_seen(max(item.pub_date for item in feed))
-        for item in self._select_new_posts(feed, cutoff):
+        chronological = sorted(
+            self._select_new_posts(feed, cutoff), key=lambda item: item.pub_date
+        )
+        for item in chronological:
             self._consumer(item)
 
     def _select_new_posts(self, feed: Feed, cutoff: datetime):

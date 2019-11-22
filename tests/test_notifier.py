@@ -20,6 +20,12 @@ NewFeedItem = FeedItem(
     pub_date=ReferenceDatetime + timedelta(days=1),
     description="new description",
 )
+NewestFeedItem = FeedItem(
+    title="Newest item",
+    link="newest link",
+    pub_date=ReferenceDatetime + timedelta(days=2),
+    description="newest description",
+)
 
 
 class InMemoryStorage:
@@ -48,16 +54,16 @@ def new_post_notifier(storage, consumer):
     return NewPostNotifier(storage, consumer)
 
 
-@pytest.fixture
-def feed():
-    return (OldFeedItem, NewFeedItem)
-
-
 class TestNewPostNotifier:
-    def test_stores_last_seen_date(self, storage, feed, new_post_notifier):
-        new_post_notifier(feed)
-        assert storage.get_last_seen() == NewFeedItem.pub_date
+    def test_stores_last_seen_date(self, storage, new_post_notifier):
+        new_post_notifier((OldFeedItem, NewestFeedItem))
+        assert storage.get_last_seen() == NewestFeedItem.pub_date
 
-    def test_notifies_consumer_for_new_items(self, consumer, feed, new_post_notifier):
-        new_post_notifier(feed)
-        consumer.assert_called_once_with(NewFeedItem)
+    def test_notifies_consumer_for_new_items(self, consumer, new_post_notifier):
+        new_post_notifier((OldFeedItem, NewestFeedItem))
+        consumer.assert_called_once_with(NewestFeedItem)
+
+    def test_notifies_in_chronological_order(self, consumer, new_post_notifier):
+        new_post_notifier((NewestFeedItem, NewFeedItem))
+        datetimes = [call[0][0].pub_date for call in consumer.call_args_list]
+        assert sorted(datetimes) == datetimes

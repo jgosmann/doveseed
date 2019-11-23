@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "doveseed"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["Jan Gosmann <jan@hyper-world.de>"]
 

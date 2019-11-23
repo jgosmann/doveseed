@@ -89,6 +89,11 @@ To check for new post and send notification emails run::
 This can either run in a regular interval as a cron job or it can be triggered
 in some way after new posts have been published.
 
+**Run this command once to initialize the database before going live because
+initially all items in the RSS feed will be considered to be old.** (This
+prevents sending a notification email for all already existing items in the
+feed.)
+
 
 Usage of the REST interface
 ---------------------------

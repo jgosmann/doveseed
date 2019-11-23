@@ -25,7 +25,7 @@ class EmailNotifier:
         connection: ConnectionManager,
         message_provider: EmailMessageProvider,
     ):
-        self._subscribers = storage.get_all_active_subscribers()
+        self._subscribers = list(storage.get_all_active_subscribers())
         self._connection = connection
         self._message_provider = message_provider
 

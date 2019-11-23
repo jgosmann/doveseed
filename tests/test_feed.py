@@ -7,7 +7,7 @@ from doveseed.feed import parse_rss
 
 sample_rss = ElementTree.fromstring(
     """
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:og="http://ogp.me/ns#">
   <channel>
     <title>title</title>
     <link>https://link.org/</link>
@@ -22,6 +22,7 @@ sample_rss = ElementTree.fromstring(
       <pubDate>Thu, 03 Oct 2019 20:11:47 +0200</pubDate>
       <guid>https://link.org/post/</guid>
       <description>description</description>
+      <og:image>image</og:image>
     </item>
   </channel>
 </rss>
@@ -53,6 +54,6 @@ def test_parse_rss():
                 2019, 10, 3, 20, 11, 47, tzinfo=TimezoneOffset(timedelta(hours=2))
             ),
             description="description",
-            image=None,
+            image="image",
         )
     ]

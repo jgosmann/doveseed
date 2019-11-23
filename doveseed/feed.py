@@ -30,15 +30,18 @@ def parse_rss(rss: ElementTree.Element) -> Iterable[FeedItem]:
             pass
 
 
+_ns = {"og": "http://ogp.me/ns#"}
+
+
 def _get_optional(item, tag, default=None):
-    elem = item.find(tag)
+    elem = item.find(tag, _ns)
     if elem is None:
         return default
     return elem.text
 
 
 def _get_required(item, tag):
-    elem = item.find(tag)
+    elem = item.find(tag, _ns)
     if elem is None:
         raise RequiredElementError(tag)
     return elem.text

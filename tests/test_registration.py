@@ -95,7 +95,6 @@ class TestRegistrationServiceSubscribe:
             last_update=utcnow(),
             confirm_token=token_generator.generated_tokens[0],
             confirm_action=Action.subscribe,
-            immediate_unsubscribe_token=None,
         )
 
     def test_if_email_unknown_sends_subscription_confirm_mail(
@@ -120,7 +119,6 @@ class TestRegistrationServiceSubscribe:
                 last_update=utcnow() - timedelta(days=1),
                 confirm_token=next(token_generator),
                 confirm_action=Action.subscribe,
-                immediate_unsubscribe_token=None,
             )
         )
 
@@ -175,10 +173,7 @@ class TestRegistrationServiceSubscribe:
         given_email = Email("subscribed@test.org")
         storage.upsert(
             Registration(
-                email=given_email,
-                state=state,
-                last_update=utcnow() - timedelta(days=1),
-                immediate_unsubscribe_token=Token(b"token"),
+                email=given_email, state=state, last_update=utcnow() - timedelta(days=1)
             )
         )
 
@@ -187,10 +182,7 @@ class TestRegistrationServiceSubscribe:
         stored = storage.find(given_email)
         assert not confirmation_requester.request_confirmation.called
         assert stored == Registration(
-            email=given_email,
-            state=state,
-            last_update=utcnow() - timedelta(days=1),
-            immediate_unsubscribe_token=Token(b"token"),
+            email=given_email, state=state, last_update=utcnow() - timedelta(days=1)
         )
 
     def test_fails_when_trying_to_subscribe_multiple_email_addresses(

@@ -36,7 +36,6 @@ class TestTinyDbStorage:
             "state": "subscribed",
             "confirm_action": None,
             "confirm_token": None,
-            "immediate_unsubscribe_token": None,
         }
 
     def test_upsert_of_existing_entity(self, tiny_db, tiny_db_storage):
@@ -59,7 +58,6 @@ class TestTinyDbStorage:
             "state": "subscribed",
             "confirm_action": None,
             "confirm_token": None,
-            "immediate_unsubscribe_token": None,
         }
 
     def test_find_of_non_exsting_entity_returns_none(self, tiny_db_storage):
@@ -74,7 +72,6 @@ class TestTinyDbStorage:
                 "state": "subscribed",
                 "confirm_action": None,
                 "confirm_token": None,
-                "immediate_unsubscribe_token": None,
             }
         )
 
@@ -92,7 +89,6 @@ class TestTinyDbStorage:
                 "state": "subscribed",
                 "confirm_action": None,
                 "confirm_token": None,
-                "immediate_unsubscribe_token": None,
             }
         )
 
@@ -113,7 +109,6 @@ class TestTinyDbStorage:
                 state=State.subscribed,
                 confirm_action=None,
                 confirm_token=None,
-                immediate_unsubscribe_token=None,
             ),
             Registration(
                 email=Email("mail2@test.org"),
@@ -121,7 +116,6 @@ class TestTinyDbStorage:
                 state=State.pending_subscribe,
                 confirm_action=Action.subscribe,
                 confirm_token=Token(b"token"),
-                immediate_unsubscribe_token=Token(b"another token"),
             ),
         ),
     )
@@ -138,13 +132,11 @@ class TestTinyDbStorage:
                 state=State.pending_subscribe,
                 confirm_action=Action.subscribe,
                 confirm_token=Token(b"token"),
-                immediate_unsubscribe_token=Token(b"another token"),
             ),
             Registration(
                 email=Email("mail2@test.org"),
                 last_update=reference_datetime - timedelta(days=3),
                 state=State.subscribed,
-                immediate_unsubscribe_token=Token(b"another token"),
             ),
             Registration(
                 email=Email("mail3@test.org"),
@@ -152,7 +144,6 @@ class TestTinyDbStorage:
                 state=State.pending_unsubscribe,
                 confirm_action=Action.unsubscribe,
                 confirm_token=Token(b"token"),
-                immediate_unsubscribe_token=Token(b"another token"),
             ),
         )
         old = (
@@ -162,7 +153,6 @@ class TestTinyDbStorage:
                 state=State.pending_subscribe,
                 confirm_action=Action.subscribe,
                 confirm_token=Token(b"token"),
-                immediate_unsubscribe_token=Token(b"another token"),
             ),
         )
 
@@ -189,7 +179,6 @@ class TestTinyDbStorage:
                 email=Email("mail1@test.org"),
                 last_update=datetime.utcnow(),
                 state=State.subscribed,
-                immediate_unsubscribe_token=None,
             ),
             Registration(
                 email=Email("mail2@test.org"),
@@ -197,7 +186,6 @@ class TestTinyDbStorage:
                 state=State.pending_unsubscribe,
                 confirm_action=Action.unsubscribe,
                 confirm_token=Token(b"token"),
-                immediate_unsubscribe_token=Token(b"another token"),
             ),
         )
         inactive = (
@@ -207,7 +195,6 @@ class TestTinyDbStorage:
                 state=State.pending_subscribe,
                 confirm_action=Action.subscribe,
                 confirm_token=Token(b"token"),
-                immediate_unsubscribe_token=Token(b"another token"),
             ),
         )
 

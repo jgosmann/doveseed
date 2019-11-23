@@ -15,7 +15,6 @@ class Registration:
     state: State
     confirm_token: Optional[Token] = None
     confirm_action: Optional[Action] = None
-    immediate_unsubscribe_token: Optional[Token] = None
 
 
 class Storage(Protocol):

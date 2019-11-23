@@ -13,13 +13,11 @@ def test_email_notifier():
             email=Email("mail1@test.org"),
             last_update=datetime.utcnow(),
             state=State.subscribed,
-            immediate_unsubscribe_token=None,
         ),
         Registration(
             email=Email("mail2@test.org"),
             last_update=datetime.utcnow(),
             state=State.subscribed,
-            immediate_unsubscribe_token=None,
         ),
     ]
     message = EmailMessage()

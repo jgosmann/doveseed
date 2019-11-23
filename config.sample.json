@@ -1,5 +1,6 @@
 {
   "db": "doveseed-db.json",
+  "rss": "https://doveseed.local/index.xml",
   "smtp": {
     "host": "",
     "user": "",

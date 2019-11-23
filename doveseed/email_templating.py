@@ -87,5 +87,6 @@ class EmailFromTemplateProvider:
         msg.add_alternative(html, subtype="html")
         msg["Subject"] = subject
         msg["From"] = self.settings.sender
+        msg["To"] = to_email
 
         return msg

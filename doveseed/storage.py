@@ -88,3 +88,13 @@ class TinyDbStorage:
         self._tinydb.upsert(
             {"key": "last_seen", "value": value.isoformat()}, Query().key == "last_seen"
         )
+
+    def get_all_active_subscribers(self):
+        registration = Query()
+        subscribers = self._tinydb.search(
+            (registration.state == State.subscribed.name)
+            | (registration.state == State.pending_unsubscribe.name)
+        )
+        for subscriber in subscribers:
+            self._deserialize_in_place(Registration, subscriber)
+            yield Registration(**subscriber)

@@ -182,3 +182,38 @@ class TestTinyDbStorage:
         now = datetime.utcnow()
         tiny_db_storage.set_last_seen(now)
         assert tiny_db_storage.get_last_seen() == now
+
+    def test_get_all_active_subscribers(self, tiny_db_storage):
+        active = (
+            Registration(
+                email=Email("mail1@test.org"),
+                last_update=datetime.utcnow(),
+                state=State.subscribed,
+                immediate_unsubscribe_token=None,
+            ),
+            Registration(
+                email=Email("mail2@test.org"),
+                last_update=datetime.now(),
+                state=State.pending_unsubscribe,
+                confirm_action=Action.unsubscribe,
+                confirm_token=Token(b"token"),
+                immediate_unsubscribe_token=Token(b"another token"),
+            ),
+        )
+        inactive = (
+            Registration(
+                email=Email("mail3@test.org"),
+                last_update=datetime.now(),
+                state=State.pending_subscribe,
+                confirm_action=Action.subscribe,
+                confirm_token=Token(b"token"),
+                immediate_unsubscribe_token=Token(b"another token"),
+            ),
+        )
+
+        for r in active + inactive:
+            tiny_db_storage.upsert(r)
+
+        result = tiny_db_storage.get_all_active_subscribers()
+
+        assert tuple(sorted(result, key=lambda r: r.email)) == active

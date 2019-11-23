@@ -67,3 +67,7 @@ class TestNewPostNotifier:
         new_post_notifier((NewestFeedItem, NewFeedItem))
         datetimes = [call[0][0].pub_date for call in consumer.call_args_list]
         assert sorted(datetimes) == datetimes
+
+    def test_handles_empty_feed(self, storage, new_post_notifier):
+        new_post_notifier(tuple())
+        assert storage.get_last_seen() is not None

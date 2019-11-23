@@ -30,7 +30,10 @@ class NewPostNotifier:
     def __call__(self, feed: Feed) -> None:
         cutoff = self._storage.get_last_seen()
         feed = list(feed)
-        self._storage.set_last_seen(max(item.pub_date for item in feed))
+        last_seen = (
+            max(item.pub_date for item in feed) if len(feed) > 0 else datetime.utcnow()
+        )
+        self._storage.set_last_seen(last_seen)
         chronological = sorted(
             self._select_new_posts(feed, cutoff), key=lambda item: item.pub_date
         )

@@ -37,7 +37,10 @@ class EmailFromTemplateProvider:
     ) -> EmailMessage:
         encoded_token = quote(confirm_token.to_string())
         confirm_link = self.settings.confirm_url_format.format(
-            email=quote(to_email), host=self.settings.host, token=encoded_token
+            action=action.name,
+            email=quote(to_email),
+            host=self.settings.host,
+            token=encoded_token,
         )
 
         substitutions = dict(

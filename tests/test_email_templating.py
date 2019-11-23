@@ -32,7 +32,7 @@ def settings():
         display_name="display_name",
         sender="sender <sender@test.org>",
         host="test.local",
-        confirm_url_format="https://{host}/confirm/{email}?token={token}",
+        confirm_url_format="https://{host}/{action}/confirm/{email}?token={token}",
     )
 
 
@@ -94,8 +94,9 @@ class TestGetConfirmationRequestMsg:
             Email("email@local"), action=Action.subscribe, confirm_token=token
         )
 
-        expected_link = "https://test.local/confirm/email%40local?token=" + quote(
-            token.to_string()
+        expected_link = (
+            "https://test.local/subscribe/confirm/email%40local?token="
+            + quote(token.to_string())
         )
         assert msg["Subject"] == expected_link
         assert (

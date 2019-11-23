@@ -25,13 +25,13 @@ def clean_unconfirmed(config: Dict[str, Any]) -> None:
 def notify_subscribers(config: Dict[str, Any]) -> None:
     db = TinyDB(config["db"])
     storage = TinyDbStorage(db)
-    smtp_connection = smtp_connection(**config["smtp"])
+    connection = smtp_connection(**config["smtp"])
     message_provider = EmailFromTemplateProvider(
         settings=EmailFromTemplateProvider.Settings(**config["template_vars"]),
         template_loader=FileSystemLoader(config["email_templates"]),
         binary_loader=FileSystemBinaryLoader(config["email_templates"]),
     )
-    email_notifier = EmailNotifier(storage, smtp_connection, message_provider)
+    email_notifier = EmailNotifier(storage, connection, message_provider)
     feed_consumer = NewPostNotifier(storage, email_notifier)
     feed_consumer(parse_rss(get_feed(config["rss"])))
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+from datetime import datetime
 from email.message import EmailMessage
 import getpass
 import sys
@@ -9,7 +10,15 @@ from jinja2 import FileSystemLoader
 
 from doveseed.smtp import smtp_connection
 from doveseed.email_templating import EmailFromTemplateProvider, FileSystemBinaryLoader
-from doveseed.types import Email, Token, Action
+from doveseed.domain_types import Email, FeedItem, Token, Action
+
+LoremIpsum = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
+dictum commodo odio, sed blandit dui convallis eget. Donec quis ipsum urna.
+Aenean a dolor eget nibh tincidunt porta vitae id dui. Morbi vitae sapien erat.
+Mauris et mollis risus, et feugiat libero. Pellentesque quis scelerisque erat.
+Fusce sollicitudin aliquam orci vitae tristique. Donec vulputate dolor ut
+malesuada molestie. Nunc tempus tellus vel ipsum aliquam, ac tincidunt metus
+aliquet. Curabitur non molestie nunc."""
 
 parser = argparse.ArgumentParser(
     description="Generate and send test emails from a template."
@@ -48,10 +57,17 @@ parser.add_argument(
 parser.add_argument(
     "--types",
     type=str,
-    choices=("subscribe", "unsubscribe"),
+    choices=("subscribe", "unsubscribe", "new-post"),
     nargs="+",
     help="Types of emails to send.",
-    default=("subscribe", "unsubscribe"),
+    default=("subscribe", "unsubscribe", "new-post"),
+)
+parser.add_argument(
+    "--image",
+    type=str,
+    nargs=1,
+    help="Image to use for new-post email.",
+    default=[None],
 )
 
 if __name__ == "__main__":
@@ -74,14 +90,24 @@ if __name__ == "__main__":
     )
 
     token = Token(b"token")
-    dispatch = dict(
-        subscribe=lambda: message_provider.get_confirmation_request_msg(
+    dispatch = {
+        "subscribe": lambda: message_provider.get_confirmation_request_msg(
             args.to_mail[0], action=Action.subscribe, confirm_token=token
         ),
-        unsubscribe=lambda: message_provider.get_confirmation_request_msg(
+        "unsubscribe": lambda: message_provider.get_confirmation_request_msg(
             args.to_mail[0], action=Action.unsubscribe, confirm_token=token
         ),
-    )
+        "new-post": lambda: message_provider.get_new_post_msg(
+            FeedItem(
+                title="Post title",
+                description=LoremIpsum,
+                link="https://doveseed.local/post",
+                pub_date=datetime.now(),
+                image=args.image[0],
+            ),
+            args.to_mail[0],
+        ),
+    }
 
     with conn() as smtp:
         for email_type in args.types:

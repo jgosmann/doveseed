@@ -1,5 +1,6 @@
 from base64 import b64encode, b64decode
 from datetime import datetime
+from typing import Optional
 
 from dataclasses import dataclass
 from enum import Enum
@@ -18,6 +19,7 @@ class FeedItem:
     link: str
     pub_date: datetime
     description: str
+    image: Optional[str]
 
 
 @dataclass

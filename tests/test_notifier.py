@@ -13,18 +13,21 @@ OldFeedItem = FeedItem(
     link="old link",
     pub_date=ReferenceDatetime - timedelta(days=1),
     description="old description",
+    image=None,
 )
 NewFeedItem = FeedItem(
     title="New item",
     link="new link",
     pub_date=ReferenceDatetime + timedelta(days=1),
     description="new description",
+    image=None,
 )
 NewestFeedItem = FeedItem(
     title="Newest item",
     link="newest link",
     pub_date=ReferenceDatetime + timedelta(days=2),
     description="newest description",
+    image=None,
 )
 
 

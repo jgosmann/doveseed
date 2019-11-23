@@ -53,5 +53,6 @@ def test_parse_rss():
                 2019, 10, 3, 20, 11, 47, tzinfo=TimezoneOffset(timedelta(hours=2))
             ),
             description="description",
+            image=None,
         )
     ]

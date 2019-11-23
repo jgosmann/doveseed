@@ -18,21 +18,22 @@ def parse_rss(rss: ElementTree.Element) -> Iterable[FeedItem]:
     for item in channel.findall("item"):
         try:
             yield FeedItem(
-                title=_get_optional(item, "title"),
+                title=_get_optional(item, "title", ""),
                 link=_get_required(item, "link"),
                 pub_date=datetime.strptime(
                     _get_required(item, "pubDate"), "%a, %d %b %Y %H:%M:%S %z"
                 ),
-                description=_get_optional(item, "description"),
+                description=_get_optional(item, "description", ""),
+                image=_get_optional(item, "og:image"),
             )
         except RequiredElementError:
             pass
 
 
-def _get_optional(item, tag):
+def _get_optional(item, tag, default=None):
     elem = item.find(tag)
     if elem is None:
-        return ""
+        return default
     return elem.text
 
 

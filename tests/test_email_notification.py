@@ -22,7 +22,11 @@ def test_email_notifier():
     ]
     message = EmailMessage()
     feed_item = FeedItem(
-        title="title", link="link", pub_date=datetime.now(), description="description"
+        title="title",
+        link="link",
+        pub_date=datetime.now(),
+        description="description",
+        image=None,
     )
 
     storage = MagicMock()

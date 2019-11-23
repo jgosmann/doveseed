@@ -43,6 +43,7 @@ def feed_item():
         link="link",
         pub_date=datetime(2019, 11, 22),
         description="description",
+        image=None,
     )
 
 

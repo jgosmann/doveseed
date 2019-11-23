@@ -12,11 +12,13 @@ Logger = logging.getLogger(__name__)
 
 
 class ReCaptchaMiddleware:
-    def __init__(self, app, paths, valid_hostnames, secret):
+    def __init__(self, app, paths, config_path):
         self.app = app
         self.paths = re.compile(paths)
-        self.valid_hostnames = valid_hostnames
-        self._secret = secret
+        with open(config_path) as f:
+            config = json.load(f)
+        self.valid_hostnames = config["hostnames"]
+        self._secret = config["secret"]
 
     def __call__(self, environ, start_response):
         request = werkzeug.wrappers.Request(environ)

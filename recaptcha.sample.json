@@ -1,0 +1,4 @@
+{
+  "hostnames": ["localhost"],
+  "secret": "recaptcha secret"
+}

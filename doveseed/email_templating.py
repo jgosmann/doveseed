@@ -30,6 +30,7 @@ class EmailFromTemplateProvider:
         self.settings = settings
         self._env = Environment(loader=template_loader)
         self._env.filters["b64encode"] = lambda x: b64encode(x).decode("ascii")
+        self._env.filters["urlquote"] = quote
         self._env.globals["include_binary"] = binary_loader.load
 
     def get_confirmation_request_msg(

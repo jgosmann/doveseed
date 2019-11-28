@@ -235,6 +235,23 @@ class TestGetNewPostMsg:
             == f"{subject} {settings.display_name} {settings.host} email title"
         )
 
+    def test_urlquote(self, feed_item, settings):
+        subject = "{{ '@' | urlquote }}"
+        provider = EmailFromTemplateProvider(
+            settings=settings,
+            template_loader=MockTemplateLoader(
+                {
+                    f"new-post.subject.txt": subject,
+                    "new-post.txt": "",
+                    "new-post.html": "",
+                }
+            ),
+            binary_loader=MockBinaryLoader(dict()),
+        )
+        msg = provider.get_new_post_msg(feed_item, Email("email"))
+
+        assert msg["Subject"] == "%40"
+
     def test_include_binary_and_b64encode(self, feed_item, settings):
         binary_content = b"binary content"
         subject = "{{ include_binary('bin') | b64encode }}"

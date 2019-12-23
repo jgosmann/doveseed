@@ -1,0 +1,13 @@
+{
+  "db": "doveseed-db.json",
+  "rss": "https://doveseed.local/index.xml",
+  "smtp": null,
+  "template_vars": {
+    "display_name": "Doveseed",
+    "host": "doveseed.local",
+    "sender": "Doveseed <doveseed@doveseed.local>",
+    "confirm_url_format": "https://{host}/confirm/{email}?token={token}"
+  },
+  "email_templates": "templates/example",
+  "confirm_timeout_minutes": 2880
+}

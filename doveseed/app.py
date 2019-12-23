@@ -14,7 +14,7 @@ from .registration import (
     RegistrationService,
     UnauthorizedException,
 )
-from .smtp import smtp_connection
+from .smtp import noop_connection, smtp_connection
 from .storage import TinyDbStorage
 from .token_gen import gen_secure_token
 from .domain_types import Email, Token
@@ -24,8 +24,13 @@ def create_app_from_config(config_filename: str) -> Flask:
     with open(config_filename, "r") as f:
         config = json.load(f)
     db = TinyDB(config["db"])
+    connection = (
+        smtp_connection(**config["smtp"])
+        if config["smtp"] is not None
+        else noop_connection()
+    )
     confirmation_requester = EmailConfirmationRequester(
-        connection=smtp_connection(**config["smtp"]),
+        connection=connection,
         message_provider=EmailFromTemplateProvider(
             settings=EmailFromTemplateProvider.Settings(**config["template_vars"]),
             template_loader=FileSystemLoader(config["email_templates"]),
@@ -85,3 +90,11 @@ def create_app_from_instances(
 
 def create_app() -> Flask:
     return create_app_from_config("config.json")
+
+
+def create_app_local_dev() -> Flask:
+    from flask_cors import CORS
+
+    app = create_app_from_config("config.dev.json")
+    CORS(app)
+    return app

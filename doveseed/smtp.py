@@ -13,6 +13,11 @@ class _EstablishedSmtpConnection:
         self._smtp.send_message(msg)
 
 
+class _NoopConnection:
+    def send_message(self, msg: EmailMessage) -> None:
+        pass
+
+
 ConnectionManager = Callable[[], ContextManager[_EstablishedSmtpConnection]]
 
 
@@ -26,5 +31,13 @@ def smtp_connection(host: str, user: str, password: str) -> ConnectionManager:
             smtp.starttls(context=context)
             smtp.login(user, password)
             yield _EstablishedSmtpConnection(smtp)
+
+    return connection_manager
+
+
+def noop_connection() -> ConnectionManager:
+    @contextmanager
+    def connection_manager():
+        yield _NoopConnection()
 
     return connection_manager

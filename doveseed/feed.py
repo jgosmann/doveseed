@@ -22,7 +22,9 @@ def parse_rss(rss: ElementTree.Element) -> Iterable[FeedItem]:
                 link=_get_required(item, "link"),
                 pub_date=datetime.strptime(
                     _get_required(item, "pubDate"), "%a, %d %b %Y %H:%M:%S %Z"
-                ),
+                ).replace(
+                    tzinfo=None
+                ),  # FIXME do actual timezone conversion
                 description=_get_optional(item, "description", ""),
                 image=_get_optional(item, "og:image"),
             )

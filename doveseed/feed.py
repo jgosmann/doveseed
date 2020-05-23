@@ -21,7 +21,7 @@ def parse_rss(rss: ElementTree.Element) -> Iterable[FeedItem]:
                 title=_get_optional(item, "title", ""),
                 link=_get_required(item, "link"),
                 pub_date=datetime.strptime(
-                    _get_required(item, "pubDate"), "%a, %d %b %Y %H:%M:%S %z"
+                    _get_required(item, "pubDate"), "%a, %d %b %Y %H:%M:%S %Z"
                 ),
                 description=_get_optional(item, "description", ""),
                 image=_get_optional(item, "og:image"),

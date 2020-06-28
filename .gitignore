@@ -4,10 +4,12 @@
 __pycache__
 *.egg-info
 test.json
+.coverage
 .DS_Store
 .idea
 config.json
 config.dev.json
+coverage.xml
 doveseed-db.json
 doveseed-db.dev.json
 dist

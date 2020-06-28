@@ -35,11 +35,32 @@ Doveseed requires a configuration file in JSON format. Take a look at
     * ``{{`` and ``}}`` with ``{`` and ``}``.
 
 * ``email_templates``: Path to the templates for the emails.
+* ``confirm_timeout_minutes``: Timeout in minutes during which a subscription needs to be confirmed.
 
-**Ensure that the configuration files has appropriate permissions, i.e. only
+**Ensure that the configuration files have appropriate permissions, i.e. only
 readable by you and Doveseed.**
 
 By default the configuration filename is assumed to be ``config.json``.
+
+
+Email templates
+^^^^^^^^^^^^^^^
+
+Templates for the emails sent out are written in
+`Jinja <https://jinja.palletsprojects.com/en/2.11.x/>`_.
+Look in ``templates/example`` for example email templates.
+There is a template for each type of email being sent:
+
+* ``new-post.*``: for notifications about new posts,
+* ``subscribe.*``: for requesting confirmation to a new subscription,
+* and ``unsubscribe.*``: for requesting confirmation to a cancellation of a subscription.
+
+Each of these templates consists out of three files:
+
+* ``*.subject.txt``: for the subject line of the email,
+* ``*.txt``: for the plain text version of the email,
+* and ``*.html``: for the HTML version of the email.
+
 
 
 REST service
@@ -62,11 +83,34 @@ Sample ``passenger_wsgi.py`` file::
 CORS
 ~~~~
 
-TODO
+To set appropriate CORS headers use the
+`flask-cors <https://flask-cors.readthedocs.io/en/latest/>`_ package.
+Activate it by adding the following lines to the file where you instantiate
+the app, for example your ``passenger_wsgi.py`` file::
+
+    from flask_cors import CORS
+    CORS(application, origins=["https://my-domain.tld"])
 
 
 ReCaptcha
 ~~~~~~~~~
+
+To activate `ReCaptcha (v2) <https://www.google.com/recaptcha/>`_ verification of
+requests, add the follwing lines to the file where you instantiate the app,
+for example your ``passenger_wsgi.py`` file::
+
+    from doveseed.recaptcha import ReCaptchaMiddleware
+    application.wsgi_app = ReCaptchaMiddleware(
+        application.wsgi_app, '^/(un)?subscribe/.*', 'recaptcha.json')
+
+Also, create the ``recaptcha.json`` with the required ReCaptcha configuration::
+
+* ``hostnames``: List of hostnames to accept ReCaptchas from.
+* ``secret``: The shared key between your site and reCAPTCHA.
+
+
+**Ensure that the configuration files have appropriate permissions, i.e. only
+readable by you and Doveseed.**
 
 
 Database cleanup
@@ -97,11 +141,5 @@ feed.)
 
 Usage of the REST interface
 ---------------------------
-
-TODO
-
-
-Email templates
----------------
 
 TODO

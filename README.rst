@@ -139,7 +139,43 @@ prevents sending a notification email for all already existing items in the
 feed.)
 
 
-Usage of the REST interface
----------------------------
+REST interface
+--------------
 
-TODO
+Subscribe
+^^^^^^^^^
+
+To subscribe with an email address::
+
+    POST /subscribe/<url encoded email>
+    Content-Type: application/json
+
+    { captcha: "ReCaptcha returned from Google API" }
+
+This will return a ``201 NO CONTENT`` and send out the email requesting
+confirmation.
+
+Unsubscribe
+^^^^^^^^^^^
+
+To unsubscribe an email address::
+
+    POST /unsubscribe/<url encoded email>
+    Content-Type: application/json
+
+    { captcha: "ReCaptcha returned from Google API" }
+
+This will return a ``201 NO CONTENT`` and send out the email requesting
+confirmation if the email is subscribed.
+
+Confirm
+^^^^^^^
+
+To confirm a request to subscribe or unsubscribe::
+
+    POST /confirm/<url encoded email>
+    Content-Type: application/json
+    Authorization: Bearer <token from confirmation reuest email>
+
+This will return a ``201 NO CONTENT`` on success,
+and ``401 UNAUTHORIZED`` if the token or email is invalid.

@@ -1,0 +1,14 @@
+Hi there,
+
+{{ display_name }} published a new post:
+
+{{ post.title }}
+
+{{ post.description }}
+
+Read it here: {{ post.link }}
+
+
+To unsubscribe from this notification click this link:
+
+https://{{ host }}/unsubscribe/?email={{ to_email | urlquote }}

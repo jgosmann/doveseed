@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="x-dns-prefetch-control" content="off">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>{{ subject | e }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style type="text/css">{% include 'files/style.css' %}</style>
+    </head>
+    </head>
+    <body>
+        <main>
+            <p>Hi there,</p>
+            <p><a href="https://{{ host }}">{{ display_name }}</a> published a new post:</p>
+            <h1>{{ post.title }}</h1>
+            <p>{{ post.description }}</h1>
+            <p><a href="{{ post.link }}">Read it now</a></p>
+            <p class="small"><a href="https://{{ host }}/unsubscribe/?email={{ to_email | urlquote }}">Unsubscribe from these notifications.</a></p>
+        </main>
+    </body>
+</html>

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "doveseed"
-version = "1.0.1"
+version = "1.0.2"
 description = "Doveseed is a backend service for email subscriptions to RSS feeds."
 authors = ["Jan Gosmann <jan@hyper-world.de>"]
 license = "MIT"

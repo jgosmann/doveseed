@@ -1,3 +1,20 @@
+.. image:: https://travis-ci.com/jgosmann/doveseed.svg?branch=master
+  :target: https://travis-ci.com/jgosmann/doveseed
+  :alt: Travis-CI build
+.. image:: https://codecov.io/gh/jgosmann/doveseed/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/jgosmann/doveseed
+  :alt: Codecov coverage
+.. image:: https://img.shields.io/pypi/v/doveseed
+  :target: https://pypi.org/project/doveseed/
+  :alt: PyPI
+.. image:: https://img.shields.io/pypi/pyversions/doveseed
+  :target: https://pypi.org/project/doveseed/
+  :alt: PyPI - Python Version
+.. image:: https://img.shields.io/pypi/l/doveseed
+  :target: https://pypi.org/project/doveseed/
+  :alt: PyPI - License
+
+
 Doveseed
 ========
 

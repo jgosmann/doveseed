@@ -19,7 +19,7 @@ sample_rss = ElementTree.fromstring(
     <item>
       <title>Item title</title>
       <link>https://link.org/post/</link>
-      <pubDate>Thu, 03 Oct 2019 20:11:47 +0200</pubDate>
+      <pubDate>Thu, 03 Oct 2019 20:11:47 GMT</pubDate>
       <guid>https://link.org/post/</guid>
       <description>description</description>
       <og:image>image</og:image>
@@ -50,9 +50,7 @@ def test_parse_rss():
         FeedItem(
             title="Item title",
             link="https://link.org/post/",
-            pub_date=datetime(
-                2019, 10, 3, 20, 11, 47, tzinfo=TimezoneOffset(timedelta(hours=2))
-            ),
+            pub_date=datetime(2019, 10, 3, 20, 11, 47),
             description="description",
             image="image",
         )

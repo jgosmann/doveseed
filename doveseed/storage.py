@@ -1,7 +1,7 @@
 from base64 import b64decode, b64encode
 from collections.abc import Mapping
 from dataclasses import asdict, fields, is_dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from inspect import isclass
 from typing import Any, Dict, Optional, Type, Union
@@ -78,15 +78,22 @@ class TinyDbStorage:
 
     def get_last_seen(self):
         try:
-            return datetime.fromisoformat(
+            value = datetime.fromisoformat(
                 self._tinydb.get(Query().key == "last_seen")["value"]
             )
+            if value.tzinfo is None:
+                value = value.replace(tzinfo=timezone.utc)
+            return value
         except (KeyError, TypeError):
             return None
 
     def set_last_seen(self, value: datetime):
         self._tinydb.upsert(
-            {"key": "last_seen", "value": value.isoformat()}, Query().key == "last_seen"
+            {
+                "key": "last_seen",
+                "value": value.astimezone(tz=timezone.utc).isoformat(),
+            },
+            Query().key == "last_seen",
         )
 
     def get_all_active_subscribers(self):

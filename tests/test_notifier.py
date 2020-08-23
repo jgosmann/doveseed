@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
 import pytest
@@ -6,7 +6,7 @@ import pytest
 from doveseed.notifier import FeedItem, NewPostNotifier
 
 
-ReferenceDatetime = datetime(2019, 11, 22)
+ReferenceDatetime = datetime(2019, 11, 22, tzinfo=timezone.utc)
 
 OldFeedItem = FeedItem(
     title="Old item",
@@ -60,7 +60,9 @@ def new_post_notifier(storage, consumer):
 class TestNewPostNotifier:
     def test_stores_last_seen_date(self, storage, new_post_notifier):
         new_post_notifier((OldFeedItem, NewestFeedItem))
-        assert storage.get_last_seen() == NewestFeedItem.pub_date
+        assert storage.get_last_seen() == NewestFeedItem.pub_date.astimezone(
+            timezone.utc
+        )
 
     def test_notifies_consumer_for_new_items(self, consumer, new_post_notifier):
         new_post_notifier((OldFeedItem, NewestFeedItem))

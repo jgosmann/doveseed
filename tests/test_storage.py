@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from tinydb import TinyDB, Query
@@ -169,8 +169,17 @@ class TestTinyDbStorage:
         assert tiny_db_storage.get_last_seen() is None
 
     def test_last_seen_storage(self, tiny_db_storage):
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone(timedelta(hours=1)))
         tiny_db_storage.set_last_seen(now)
+        assert tiny_db_storage.get_last_seen() == now
+
+    def test_last_seen_storage_with_legacy_timezone_unaware_date(
+        self, tiny_db, tiny_db_storage
+    ):
+        now = datetime.now(tz=timezone.utc)
+        tiny_db.insert(
+            {"key": "last_seen", "value": now.replace(tzinfo=None).isoformat()}
+        )
         assert tiny_db_storage.get_last_seen() == now
 
     def test_get_all_active_subscribers(self, tiny_db_storage):

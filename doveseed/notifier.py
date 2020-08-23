@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Iterable, Optional
 
 from typing_extensions import Protocol
@@ -31,7 +31,9 @@ class NewPostNotifier:
         cutoff = self._storage.get_last_seen()
         feed = list(feed)
         last_seen = (
-            max(item.pub_date for item in feed) if len(feed) > 0 else datetime.utcnow()
+            max(item.pub_date for item in feed)
+            if len(feed) > 0
+            else datetime.now(tz=timezone.utc)
         )
         self._storage.set_last_seen(last_seen)
         chronological = sorted(

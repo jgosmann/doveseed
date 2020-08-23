@@ -1,4 +1,5 @@
 from datetime import datetime
+from email.utils import parsedate_to_datetime
 import urllib.request
 from typing import Iterable
 from xml.etree import ElementTree
@@ -20,11 +21,7 @@ def parse_rss(rss: ElementTree.Element) -> Iterable[FeedItem]:
             yield FeedItem(
                 title=_get_optional(item, "title", ""),
                 link=_get_required(item, "link"),
-                pub_date=datetime.strptime(
-                    _get_required(item, "pubDate"), "%a, %d %b %Y %H:%M:%S %Z"
-                ).replace(
-                    tzinfo=None
-                ),  # FIXME do actual timezone conversion
+                pub_date=parsedate_to_datetime(_get_required(item, "pubDate")),
                 description=_get_optional(item, "description", ""),
                 image=_get_optional(item, "og:image"),
             )

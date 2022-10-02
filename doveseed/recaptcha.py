@@ -1,33 +1,29 @@
 import http
 import json
 import logging
+from typing import Optional
 import urllib.request
 from urllib.parse import urlencode
 import re
 
-import werkzeug.wrappers
-import werkzeug.wrappers.json
+from werkzeug.wrappers import Request, Response
 
 
 Logger = logging.getLogger(__name__)
-
-
-class JsonRequest(werkzeug.wrappers.json.JSONMixin, werkzeug.wrappers.Request):
-    pass
 
 
 class ReCaptchaMiddleware:
     def __init__(self, app, paths, config_path):
         self.app = app
         self.paths = re.compile(paths)
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             config = json.load(f)
         self.valid_hostnames = config["hostnames"]
         self._secret = config["secret"]
 
     def __call__(self, environ, start_response):
         Logger.error("start")
-        request = JsonRequest(environ)
+        request = Request(environ)
         if self.paths.match(request.path) and request.method == "POST":
             data = request.get_json()
             if data is None or "captcha" not in data:
@@ -44,7 +40,7 @@ class ReCaptchaMiddleware:
                 )
         return self.app(environ, start_response)
 
-    def verify_captcha(self, captcha: str, remote_ip: str):
+    def verify_captcha(self, captcha: str, remote_ip: Optional[str]):
         verification_request = urllib.request.Request(
             "https://www.google.com/recaptcha/api/siteverify",
             method="POST",
@@ -59,4 +55,4 @@ class ReCaptchaMiddleware:
         return result["success"] and result["hostname"] in self.valid_hostnames
 
     def _to_response(self, environ, start_response, response):
-        return werkzeug.wrappers.Response(*response)(environ, start_response)
+        return Response(*response)(environ, start_response)

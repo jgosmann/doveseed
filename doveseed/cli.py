@@ -50,7 +50,9 @@ if __name__ == "__main__":
         type=str,
         nargs=1,
         choices=("clean", "notify"),
-        help="Action to perform: 'clean' to clean expired pending subscriptions; 'notify' to notify active subscribers about new posts.",
+        help="Action to perform: 'clean' to clean expired pending "
+        "subscriptions; 'notify' to notify active subscribers about "
+        "new posts.",
     )
     parser.add_argument(
         "config", type=str, nargs=1, help="configuration file", metavar="config"
@@ -59,7 +61,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     os.chdir(os.path.dirname(os.path.abspath(args.config[0])))
-    with open(args.config[0], "r") as f:
+    with open(args.config[0], "r", encoding="utf-8") as f:
         config = json.load(f)
 
     Actions[args.action[0]](config)

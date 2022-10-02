@@ -156,8 +156,8 @@ class TestTinyDbStorage:
             ),
         )
 
-        for r in fresh + old:
-            tiny_db_storage.upsert(r)
+        for registration in fresh + old:
+            tiny_db_storage.upsert(registration)
 
         tiny_db_storage.drop_old_unconfirmed(
             drop_before=reference_datetime - timedelta(days=2)
@@ -207,8 +207,8 @@ class TestTinyDbStorage:
             ),
         )
 
-        for r in active + inactive:
-            tiny_db_storage.upsert(r)
+        for registration in active + inactive:
+            tiny_db_storage.upsert(registration)
 
         result = tiny_db_storage.get_all_active_subscribers()
 

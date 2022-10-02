@@ -1,9 +1,9 @@
 import datetime
 import http
 import json
-from typing import Optional
 
 from flask import Flask, request
+from flask_cors import CORS
 from jinja2 import FileSystemLoader
 from tinydb import TinyDB
 
@@ -21,7 +21,7 @@ from .domain_types import Email, Token
 
 
 def create_app_from_config(config_filename: str) -> Flask:
-    with open(config_filename, "r") as f:
+    with open(config_filename, "r", encoding="utf-8") as f:
         config = json.load(f)
     db = TinyDB(config["db"])
     connection = (
@@ -57,8 +57,8 @@ def create_app_from_instances(
             if auth_type.lower() != "bearer":
                 raise UnauthorizedException("Requires bearer authorization.")
             return Token.from_string(token)
-        except (KeyError, ValueError):
-            raise UnauthorizedException("Improper Authorization header.")
+        except (KeyError, ValueError) as err:
+            raise UnauthorizedException("Improper Authorization header.") from err
 
     app = Flask("doveseed")
 
@@ -93,8 +93,6 @@ def create_app() -> Flask:
 
 
 def create_app_local_dev() -> Flask:
-    from flask_cors import CORS
-
     app = create_app_from_config("config.dev.json")
     CORS(app)
     return app

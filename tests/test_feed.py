@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone, tzinfo
 from xml.etree import ElementTree
 
+import pytest
+
 from doveseed.domain_types import FeedItem
 from doveseed.feed import parse_rss
-import pytest
 
 
 sample_rss_feeds = [

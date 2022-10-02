@@ -69,7 +69,9 @@ class TinyDbStorage:
         self._tinydb.remove(Query().email == email)
 
     def drop_old_unconfirmed(self, *, drop_before: datetime):
-        is_before = lambda v: datetime.fromisoformat(v) < drop_before
+        def is_before(value):
+            return datetime.fromisoformat(value) < drop_before
+
         registration = Query()
         self._tinydb.remove(
             registration.last_update.test(is_before)

@@ -78,13 +78,11 @@ class EmailFromTemplateProvider:
             post=feed_item,
         )
 
-        subject = self._env.get_template(f"new-post.subject.txt").render(
-            **substitutions
-        )
+        subject = self._env.get_template("new-post.subject.txt").render(**substitutions)
         substitutions["subject"] = subject
 
-        plain_text = self._env.get_template(f"new-post.txt").render(**substitutions)
-        html = self._env.get_template(f"new-post.html").render(**substitutions)
+        plain_text = self._env.get_template("new-post.txt").render(**substitutions)
+        html = self._env.get_template("new-post.html").render(**substitutions)
 
         msg = EmailMessage()
         msg.set_content(plain_text)

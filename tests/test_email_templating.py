@@ -64,7 +64,7 @@ class TestGetConfirmationRequestMsg:
                     f"{action.name}.html": html,
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_confirmation_request_msg(
             to_email, action=action, confirm_token=Token(b"token")
@@ -88,7 +88,7 @@ class TestGetConfirmationRequestMsg:
                     "subscribe.html": template,
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_confirmation_request_msg(
             Email("email@local"), action=Action.subscribe, confirm_token=token
@@ -118,7 +118,7 @@ class TestGetConfirmationRequestMsg:
                     "subscribe.html": "",
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_confirmation_request_msg(
             Email("email"), action=Action.subscribe, confirm_token=Token(b"token")
@@ -139,7 +139,7 @@ class TestGetConfirmationRequestMsg:
                     "subscribe.html": template,
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_confirmation_request_msg(
             Email("email"), action=Action.subscribe, confirm_token=Token(b"token")
@@ -157,7 +157,7 @@ class TestGetConfirmationRequestMsg:
             settings=settings,
             template_loader=MockTemplateLoader(
                 {
-                    f"subscribe.subject.txt": subject,
+                    "subscribe.subject.txt": subject,
                     "subscribe.txt": "",
                     "subscribe.html": "",
                 }
@@ -173,7 +173,6 @@ class TestGetConfirmationRequestMsg:
 
 class TestGetNewPostMsg:
     def test_constructs_email_message_from_templates(self, feed_item, settings):
-        to_email = Email("to.email@test.org")
         subject = "subject"
         plain_text = "plain text"
         html = "html"
@@ -182,12 +181,12 @@ class TestGetNewPostMsg:
             settings=settings,
             template_loader=MockTemplateLoader(
                 {
-                    f"new-post.subject.txt": subject,
-                    f"new-post.txt": plain_text,
-                    f"new-post.html": html,
+                    "new-post.subject.txt": subject,
+                    "new-post.txt": plain_text,
+                    "new-post.html": html,
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_new_post_msg(feed_item, Email("email"))
 
@@ -207,7 +206,7 @@ class TestGetNewPostMsg:
                     "new-post.html": "",
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_new_post_msg(feed_item, Email("email"))
 
@@ -226,7 +225,7 @@ class TestGetNewPostMsg:
                     "new-post.html": template,
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_new_post_msg(feed_item, Email("email"))
 
@@ -241,12 +240,12 @@ class TestGetNewPostMsg:
             settings=settings,
             template_loader=MockTemplateLoader(
                 {
-                    f"new-post.subject.txt": subject,
+                    "new-post.subject.txt": subject,
                     "new-post.txt": "",
                     "new-post.html": "",
                 }
             ),
-            binary_loader=MockBinaryLoader(dict()),
+            binary_loader=MockBinaryLoader({}),
         )
         msg = provider.get_new_post_msg(feed_item, Email("email"))
 
@@ -259,7 +258,7 @@ class TestGetNewPostMsg:
             settings=settings,
             template_loader=MockTemplateLoader(
                 {
-                    f"new-post.subject.txt": subject,
+                    "new-post.subject.txt": subject,
                     "new-post.txt": "",
                     "new-post.html": "",
                 }

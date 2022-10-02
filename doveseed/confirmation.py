@@ -1,13 +1,5 @@
-from base64 import b64encode
 from email.message import EmailMessage
-import html
-import json
-import os
-import os.path
-from urllib.parse import quote
-from typing import Any, Callable, ContextManager, Dict
 
-from jinja2 import Environment, FileSystemLoader, Template
 from typing_extensions import Protocol
 
 from .smtp import ConnectionManager

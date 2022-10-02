@@ -1,12 +1,10 @@
 from datetime import datetime, timedelta
-import itertools
 from unittest.mock import MagicMock
-from typing import cast, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import pytest
 
 from doveseed.registration import (
-    ConfirmationRequester,
     Registration,
     RegistrationService,
     UnauthorizedException,

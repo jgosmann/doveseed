@@ -22,7 +22,6 @@ class ReCaptchaMiddleware:
         self._secret = config["secret"]
 
     def __call__(self, environ, start_response):
-        Logger.error("start")
         request = Request(environ)
         if self.paths.match(request.path) and request.method == "POST":
             data = request.get_json()

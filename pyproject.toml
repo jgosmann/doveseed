@@ -15,15 +15,15 @@ license = "MIT"
 name = "doveseed"
 readme = "README.rst"
 repository = "https://github.com/jgosmann/doveseed/"
-version = "1.1.0"
+version = "1.1.0a1"
 
 [tool.poetry.dependencies]
+Werkzeug = "^2.2.2"
 flask = "^2.2.2"
 jinja2 = "^3.1.2"
 python = "^3.7.2"
 tinydb = "^4.7.0"
 typing_extensions = "^4.3.0"
-Werkzeug = "^2.2.2"
 
 [tool.poetry.dev-dependencies]
 black = "22.8.0"

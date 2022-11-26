@@ -5,7 +5,7 @@ from email.message import EmailMessage
 import getpass
 import sys
 
-from doveseed.smtp import smtp_connection
+from doveseed.smtp import SslMode, smtp_connection
 
 
 parser = argparse.ArgumentParser(
@@ -13,6 +13,24 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument(
     "--host", "-H", type=str, nargs=1, help="SMTP host to connect to.", required=True
+)
+parser.add_argument(
+    "--port",
+    "-p",
+    type=int,
+    nargs=1,
+    help="SMTP port to connect to.",
+    required=False,
+    default=[0],
+)
+parser.add_argument(
+    "--ssl",
+    type=str,
+    nargs=1,
+    help="SMTP SSL mode.",
+    required=False,
+    default=[SslMode.START_TLS.value],
+    choices=[mode.value for mode in SslMode],
 )
 parser.add_argument(
     "--user",
@@ -45,7 +63,13 @@ if __name__ == "__main__":
 
     user = args.user if args.user else args.from_mail[0]
 
-    conn = smtp_connection(args.host[0], user, getpass.getpass(f"Password for {user}:"))
+    conn = smtp_connection(
+        host=args.host[0],
+        user=user,
+        password=getpass.getpass(f"Password for {user}:"),
+        port=args.port[0],
+        sslMode=args.ssl[0],
+    )
 
     msg = EmailMessage()
     msg["Subject"] = "Doveseed SMTP test mail"

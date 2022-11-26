@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 from email.message import EmailMessage
-from smtplib import SMTP
+from enum import Enum
+from smtplib import SMTP, SMTP_SSL
 import ssl
-from typing import Callable, ContextManager
+from typing import Callable, ContextManager, Generator
 
 
 class _EstablishedSmtpConnection:
@@ -21,14 +22,51 @@ class _NoopConnection:
 ConnectionManager = Callable[[], ContextManager[_EstablishedSmtpConnection]]
 
 
-def smtp_connection(host: str, user: str, password: str) -> ConnectionManager:
-    context = ssl.create_default_context()
-    context.check_hostname = True
+class SslMode(Enum):
+    NO_SSL = "no-ssl"
+    START_TLS = "start-tls"
+    TLS = "tls"
+
+    @classmethod
+    def from_str(cls, value: str) -> "SslMode":
+        for member in cls:
+            if member.value == value:
+                return member
+        raise ValueError("not a valid SslMode")
+
+
+@contextmanager
+def _connect_smtp(
+    host: str, port: int, *, context: ssl.SSLContext
+) -> Generator[SMTP, None, None]:
+    with SMTP(host, port) as smtp:
+        if context is not None:
+            smtp.starttls(context=context)
+        yield smtp
+
+
+def smtp_connection(
+    *,
+    host: str,
+    user: str,
+    password: str,
+    port: int = 0,
+    sslMode: str = SslMode.START_TLS.value
+) -> ConnectionManager:
+    _sslMode = SslMode.from_str(sslMode)
+    context = None
+    if _sslMode != SslMode.NO_SSL:
+        context = ssl.create_default_context()
+        context.check_hostname = True
+    connect: Callable[..., ContextManager[SMTP]]
+    if _sslMode == SslMode.TLS:
+        connect = SMTP_SSL
+    else:
+        connect = _connect_smtp
 
     @contextmanager
     def connection_manager():
-        with SMTP(host) as smtp:
-            smtp.starttls(context=context)
+        with connect(host, port, context=context) as smtp:
             smtp.login(user, password)
             yield _EstablishedSmtpConnection(smtp)
 

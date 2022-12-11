@@ -37,6 +37,8 @@ Doveseed requires a configuration file in JSON format. Take a look at
   * ``host``: SMTP host used to send notification emails.
   * ``user``: SMTP logon user name.
   * ``password``: SMTP logon password.
+  * ``ssl_mode``: Activate/deactivate SSL/TLS, valid values `"no-ssl"`, `"start-tls"`, `"tls"` (default `"start-tls"`).
+  * ``check_hostname``: Whether to verify the hostname when using TLS (default `true`).
 
 * ``template_vars``: Defines template variables to replace in the email templates.
 

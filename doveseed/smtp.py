@@ -51,13 +51,14 @@ def smtp_connection(
     user: str,
     password: str,
     port: int = 0,
-    sslMode: str = SslMode.START_TLS.value
+    ssl_mode: str = SslMode.START_TLS.value,
+    check_hostname: bool = True
 ) -> ConnectionManager:
-    _sslMode = SslMode.from_str(sslMode)
+    _sslMode = SslMode.from_str(ssl_mode)
     context = None
     if _sslMode != SslMode.NO_SSL:
         context = ssl.create_default_context()
-        context.check_hostname = True
+        context.check_hostname = check_hostname
     connect: Callable[..., ContextManager[SMTP]]
     if _sslMode == SslMode.TLS:
         connect = SMTP_SSL

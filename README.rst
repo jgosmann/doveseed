@@ -1,6 +1,6 @@
-.. image:: https://travis-ci.com/jgosmann/doveseed.svg?branch=master
-  :target: https://travis-ci.com/jgosmann/doveseed
-  :alt: Travis-CI build
+.. image:: https://github.com/jgosmann/doveseed/actions/workflows/ci.yml/badge.svg
+  :target: https://github.com/jgosmann/doveseed/actions/workflows/ci.yml
+  :alt: CI and release pipeline
 .. image:: https://codecov.io/gh/jgosmann/doveseed/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/jgosmann/doveseed
   :alt: Codecov coverage

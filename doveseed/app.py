@@ -1,6 +1,7 @@
 import datetime
 import http
 import json
+import os
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -37,7 +38,10 @@ def create_app_from_config(config_filename: str) -> Flask:
             binary_loader=FileSystemBinaryLoader(config["email_templates"]),
         ),
     )
-    return create_app_from_instances(db, confirmation_requester)
+    app = create_app_from_instances(db, confirmation_requester)
+    if "cors" in config:
+        app = CORS(app, **config["cors"])
+    return app
 
 
 def create_app_from_instances(

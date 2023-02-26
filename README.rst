@@ -30,6 +30,8 @@ Configuration
 Doveseed requires a configuration file in JSON format. Take a look at
 ``config.sample.json``. The format is as follows:
 
+* ``cors``: Maybe omitted to disable CORS headers. If given, will be passed to
+  ``CORS`` constructor of `flask-cors <https://flask-cors.readthedocs.io/en/latest/>`_.
 * ``db``: JSON file in which Doveseed persists its data.
 * ``rss``: URL to the RSS feed for which new notifications are to be send.
 * ``smtp``

@@ -40,7 +40,7 @@ def create_app_from_config(config_filename: str) -> Flask:
     )
     app = create_app_from_instances(db, confirmation_requester)
     if "cors" in config:
-        app = CORS(app, **config["cors"])
+        CORS(app, **config["cors"])
     return app
 
 

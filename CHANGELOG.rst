@@ -17,7 +17,6 @@ Added
 * Allow to configure CORS via the config.
 
 
-
 [1.0.3] - 2020-08-23
 --------------------
 

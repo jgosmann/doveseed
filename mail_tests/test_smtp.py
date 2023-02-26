@@ -68,7 +68,7 @@ if __name__ == "__main__":
         user=user,
         password=getpass.getpass(f"Password for {user}:"),
         port=args.port[0],
-        sslMode=args.ssl[0],
+        ssl_mode=args.ssl[0],
     )
 
     msg = EmailMessage()

@@ -44,12 +44,12 @@ class EmailFromTemplateProvider:
             token=encoded_token,
         )
 
-        substitutions = dict(
-            confirm_link=confirm_link,
-            display_name=self.settings.display_name,
-            host=self.settings.host,
-            to_email=to_email,
-        )
+        substitutions = {
+            "confirm_link": confirm_link,
+            "display_name": self.settings.display_name,
+            "host": self.settings.host,
+            "to_email": to_email,
+        }
 
         subject = self._env.get_template(f"{action.name}.subject.txt").render(
             **substitutions
@@ -72,10 +72,12 @@ class EmailFromTemplateProvider:
 
     def get_new_post_msg(self, feed_item: FeedItem, to_email: Email) -> EmailMessage:
         substitutions = dict(
-            display_name=self.settings.display_name,
-            host=self.settings.host,
-            to_email=to_email,
-            post=feed_item,
+            {
+                "display_name": self.settings.display_name,
+                "host": self.settings.host,
+                "to_email": to_email,
+                "post": feed_item,
+            }
         )
 
         subject = self._env.get_template("new-post.subject.txt").render(**substitutions)

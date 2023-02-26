@@ -25,6 +25,7 @@ class ReCaptchaMiddleware:
         request = Request(environ)
         if self.paths.match(request.path) and request.method == "POST":
             data = request.get_json()
+            # pylint: disable=unsupported-membership-test,unsubscriptable-object
             if data is None or "captcha" not in data:
                 return self._to_response(
                     environ,

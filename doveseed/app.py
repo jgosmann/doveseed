@@ -93,10 +93,4 @@ def create_app_from_instances(
 
 
 def create_app() -> Flask:
-    return create_app_from_config("config.json")
-
-
-def create_app_local_dev() -> Flask:
-    app = create_app_from_config("config.dev.json")
-    CORS(app)
-    return app
+    return create_app_from_config(os.environ.get("DOVESEED_CONFIG", "config.json"))

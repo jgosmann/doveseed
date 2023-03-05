@@ -12,8 +12,8 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Added
 ^^^^^
 
-* Allow connecting to SMTP with SSL (instead of `START_TLS`) or no encrpytion
-  at all. See the `ssl_mode` option.
+* Allow connecting to SMTP with SSL (instead of ``START_TLS``) or no encrpytion
+  at all. See the ``ssl_mode`` option.
 * Allow to configure CORS via the config.
 * Health-check endpoint at ``/health``.
 

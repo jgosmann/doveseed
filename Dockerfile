@@ -6,11 +6,15 @@ RUN python3 -m venv venv && \
 
 FROM python:3.11-alpine AS runner
 
+RUN apk add curl
+
 RUN addgroup --system --gid 1000 doveseed &&\
     adduser --system --uid 1000 doveseed
 USER doveseed
 
 COPY --from=builder /venv /venv
+
+HEALTHCHECK --start-period=5s CMD ["curl", "--fail", "http://localhost:5000/health"]
 
 EXPOSE 5000
 

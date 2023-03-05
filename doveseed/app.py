@@ -66,6 +66,10 @@ def create_app_from_instances(
 
     app = Flask("doveseed")
 
+    @app.route("/health", methods=["GET"])
+    def health():
+        return "", http.HTTPStatus.NO_CONTENT
+
     @app.route("/subscribe/<email>", methods=["POST"])
     def subscribe(email: str):
         registration_service.subscribe(Email(email))

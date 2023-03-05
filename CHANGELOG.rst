@@ -15,6 +15,7 @@ Added
 * Allow connecting to SMTP with SSL (instead of ``START_TLS``) or no encrpytion
   at all. See the ``ssl_mode`` option.
 * Allow to configure CORS via the config.
+* Health-check endpoint at ``/health``.
 
 
 [1.0.3] - 2020-08-23

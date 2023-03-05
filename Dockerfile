@@ -12,6 +12,8 @@ USER doveseed
 
 COPY --from=builder /venv /venv
 
+HEALTHCHECK --start-period=5s CMD ["curl", "--fail", "http://localhost:5000/health"]
+
 EXPOSE 5000
 
 ENV FLASK_APP="doveseed.app:create_app()"

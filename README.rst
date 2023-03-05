@@ -163,6 +163,15 @@ feed.)
 REST interface
 --------------
 
+Health
+^^^^^^
+
+To check the service health:
+
+    GET /health
+
+Returns a 204 (no content) status if the service is up and running.
+
 Subscribe
 ^^^^^^^^^
 

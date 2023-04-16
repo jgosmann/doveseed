@@ -1,5 +1,5 @@
 [tool.poetry]
-authors = ["Jan Gosmann <jan@hyper-world.de>"] 
+authors = ["Jan Gosmann <jan@hyper-world.de>"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: Flask",
@@ -7,14 +7,14 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Communications :: Email",
   "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-] 
-description = "Doveseed is a backend service for email subscriptions to RSS feeds." 
-keywords = ["email", "rss", "subscriptions"] 
-license = "MIT" 
-name = "doveseed" 
-readme = "README.rst" 
-repository = "https://github.com/jgosmann/doveseed/" 
-version = "2.0.0a3" # Also update in doveseed/__init__.py
+]
+description = "Doveseed is a backend service for email subscriptions to RSS feeds."
+keywords = ["email", "rss", "subscriptions"]
+license = "MIT"
+name = "doveseed"
+readme = "README.rst"
+repository = "https://github.com/jgosmann/doveseed/"
+version = "2.0.0a4" # Also update in doveseed/__init__.py
 
 [tool.poetry.dependencies]
 aiohttp = {version = "^3.8.4", optional = true}

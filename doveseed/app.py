@@ -4,12 +4,13 @@ from functools import cache
 import json
 from typing import Annotated, Literal, Optional, Union
 
-from fastapi import Depends, FastAPI, Header, Request, status
+from fastapi import Depends, FastAPI, Header, Path, Request, status
 from fastapi.responses import PlainTextResponse
 from jinja2 import FileSystemLoader
 from pydantic import BaseSettings
 from tinydb import TinyDB
 
+from doveseed import __version__
 from doveseed.config import Config, SmtpConfig, TemplateVarsConfig
 
 from .confirmation import EmailConfirmationRequester
@@ -95,7 +96,13 @@ def get_registration_service(
 
 
 def require_bearer_token(
-    authorization: Annotated[Optional[str], Header()] = None
+    authorization: Annotated[
+        Optional[str],
+        Header(
+            description="Header providing credentials to authorize the requested operation.",
+            example="Bearer 6RQkYl6o8aWzPe5IfGuZBA==",
+        ),
+    ] = None
 ) -> Token:
     if authorization is None:
         raise UnauthorizedException("Improper Authorization header.")
@@ -106,18 +113,33 @@ def require_bearer_token(
 
 
 app = FastAPI(
-    openapi_url="/openapi.json" if Settings().doveseed_env == "development" else None
+    title="Doveseed",
+    version=__version__,
+    description="Doveseed is a backend service for email subscriptions to RSS feeds.",
+    openapi_url="/openapi.json" if Settings().doveseed_env == "development" else None,
 )
 
 
-@app.get("/health", status_code=status.HTTP_204_NO_CONTENT)
+@app.get(
+    "/health",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Returns a success status if the service is up and running.",
+)
 async def health():
     pass
 
 
-@app.post("/subscribe/{email}", status_code=status.HTTP_204_NO_CONTENT)
+@app.post(
+    "/subscribe/{email}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Request to subscribe an email address and send out an email asking "
+    "for confirmation.",
+)
 def subscribe(
-    email: str,
+    email: Annotated[
+        str,
+        Path(description="Email address to subscribe.", example="john.doe@example.com"),
+    ],
     registration_service: Annotated[
         RegistrationService, Depends(get_registration_service)
     ],
@@ -125,9 +147,19 @@ def subscribe(
     registration_service.subscribe(Email(email))
 
 
-@app.post("/unsubscribe/{email}", status_code=status.HTTP_204_NO_CONTENT)
+@app.post(
+    "/unsubscribe/{email}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Request to unsubscribe an email address and send out an email "
+    "asking for confirmation.",
+)
 def unsubscribe(
-    email: str,
+    email: Annotated[
+        str,
+        Path(
+            description="Email address to unsubscribe.", example="john.doe@example.com"
+        ),
+    ],
     registration_service: Annotated[
         RegistrationService, Depends(get_registration_service)
     ],
@@ -135,9 +167,21 @@ def unsubscribe(
     registration_service.unsubscribe(Email(email))
 
 
-@app.post("/confirm/{email}", status_code=status.HTTP_204_NO_CONTENT)
+@app.post(
+    "/confirm/{email}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Confirm a request to subscribe or unsubscribe an email address. "
+    "This needs to be authorized with the token delivered in the email asking for "
+    "confirmation.",
+)
 def confirm(
-    email: str,
+    email: Annotated[
+        str,
+        Path(
+            description="Email address to confirm subscribing or unsubscribing for.",
+            example="john.doe@example.com",
+        ),
+    ],
     registration_service: Annotated[
         RegistrationService, Depends(get_registration_service)
     ],

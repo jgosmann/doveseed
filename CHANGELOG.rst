@@ -13,6 +13,7 @@ Changed
 ^^^^^^^
 
 * Ported the code from Flask to FastAPI.
+* The ``app`` argument was removed from the ``ReCaptchaMiddleware``.
 
 Removed
 ^^^^^^^

@@ -5,6 +5,7 @@ from typing import Literal, Optional, Union
 @dataclass(frozen=True)
 class SmtpConfig:
     host: str
+    port: int
     user: str
     password: str
     ssl_mode: Union[

@@ -2,7 +2,7 @@ FROM python:3.11-slim AS builder
 ARG version
 
 RUN python3 -m venv venv && \
-    venv/bin/pip3 --disable-pip-version-check install doveseed==${version}
+    venv/bin/pip3 --disable-pip-version-check install 'doveseed[all]'==${version}
 
 FROM python:3.11-alpine AS runner
 

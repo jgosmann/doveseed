@@ -8,7 +8,7 @@ runs:
       shell: bash
 
     - name: Install dependencies
-      run: poetry install
+      run: poetry install --extras all
       shell: bash
       env:
         POETRY_VIRTUALENVS_IN_PROJECT: true

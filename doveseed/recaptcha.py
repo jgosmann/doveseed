@@ -1,11 +1,10 @@
 import json
 import logging
 from typing import Optional
-import urllib.request
-from urllib.parse import urlencode
 import re
 import socket
 
+import aiohttp
 from fastapi import Request, status
 from fastapi.responses import PlainTextResponse
 
@@ -29,7 +28,7 @@ class ReCaptchaMiddleware:
                 return PlainTextResponse(
                     status_code=status.HTTP_400_BAD_REQUEST, content="Missing captcha."
                 )
-            if not self.verify_captcha(
+            if not await self.verify_captcha(
                 data["captcha"],
                 socket.gethostbyname(request.client.host) if request.client else None,
             ):
@@ -38,16 +37,17 @@ class ReCaptchaMiddleware:
                 )
         return await call_next(request)
 
-    def verify_captcha(self, captcha: str, remote_ip: Optional[str]):
-        verification_request = urllib.request.Request(
-            "https://www.google.com/recaptcha/api/siteverify",
-            method="POST",
-            data=urlencode(
-                {"secret": self._secret, "response": captcha, "remoteip": remote_ip}
-            ).encode("ascii"),
-        )
-        with urllib.request.urlopen(verification_request) as f:
-            result = json.loads(f.read())
+    async def verify_captcha(self, captcha: str, remote_ip: Optional[str]):
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "https://www.google.com/recaptcha/api/siteverify",
+                data={
+                    "secret": self._secret,
+                    "response": captcha,
+                    "remoteip": remote_ip,
+                },
+            ) as response:
+                result = await response.json()
         if len(result.get("error-codes", [])) > 0:
             Logger.warning(result["error-codes"])
         return result["success"] and result["hostname"] in self.valid_hostnames

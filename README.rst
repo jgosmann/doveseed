@@ -112,8 +112,14 @@ following lines to the file where you instantiate the app::
 ReCaptcha
 ~~~~~~~~~
 
-To activate `ReCaptcha (v2) <https://www.google.com/recaptcha/>`_ verification of
-requests, add the follwing lines to the file where you instantiate the app::
+You activate `ReCaptcha (v2) <https://www.google.com/recaptcha/>`_ verification of
+requests with Doveseed.
+
+First, you need to install the required optional dependencies::
+
+    pip install 'doveseed[recaptcha]'
+
+Then, add the follwing lines to the file where you instantiate the app::
 
     from doveseed.app import app
     from doveseed.recaptcha import ReCaptchaMiddleware

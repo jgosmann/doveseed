@@ -17,6 +17,7 @@ repository = "https://github.com/jgosmann/doveseed/"
 version = "2.0.0a0" # Also update in doveseed/__init__.py
 
 [tool.poetry.dependencies]
+aiohttp = {version = "^3.8.4", optional = true}
 fastapi = "^0.95.0"
 jinja2 = "^3.1.2"
 python = "^3.9.0"
@@ -25,8 +26,8 @@ tinydb = "^4.7.0"
 typing_extensions = "^4.3.0"
 
 [tool.poetry.extras]
-all = ['starlette']
-recaptcha = ["starlette"]
+all = ["aiohttp", "starlette"]
+recaptcha = ["aiohttp", "starlette"]
 
 [tool.poetry.group.dev.dependencies]
 black = "22.8.0"

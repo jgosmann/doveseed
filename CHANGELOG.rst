@@ -18,6 +18,7 @@ Changed
 Removed
 ^^^^^^^
 
+* Support for Python 3.7, 3.8.
 * CORS configuration via the configuration JSON file. Use the `FastAPI
   CORSMiddleware <https://fastapi.tiangolo.com/tutorial/cors/>`_ instead.
 

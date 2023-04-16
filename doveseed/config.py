@@ -7,6 +7,7 @@ class SmtpConfig:
     host: str
     user: str
     password: str
+    port: int = 25
     ssl_mode: Union[
         Literal["no-ssl"], Literal["start-tls"], Literal["tls"]
     ] = "start-tls"

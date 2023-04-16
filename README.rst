@@ -112,15 +112,13 @@ following lines to the file where you instantiate the app::
 ReCaptcha
 ~~~~~~~~~
 
-CURRENTLY BROKEN (not yet ported to FastAPI)
-
 To activate `ReCaptcha (v2) <https://www.google.com/recaptcha/>`_ verification of
-requests, add the follwing lines to the file where you instantiate the app,
-for example your ``passenger_wsgi.py`` file::
+requests, add the follwing lines to the file where you instantiate the app::
 
+    from doveseed.app import app
     from doveseed.recaptcha import ReCaptchaMiddleware
-    application.wsgi_app = ReCaptchaMiddleware(
-        application.wsgi_app, '^/(un)?subscribe/.*', 'recaptcha.json')
+
+    app.add_middleware = ReCaptchaMiddleware('^/(un)?subscribe/.*', 'recaptcha.json')
 
 Also, create the ``recaptcha.json`` with the required ReCaptcha configuration::
 

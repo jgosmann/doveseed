@@ -37,8 +37,8 @@ Doveseed requires a configuration file in JSON format. Take a look at
   * ``host``: SMTP host used to send notification emails.
   * ``user``: SMTP logon user name.
   * ``password``: SMTP logon password.
-  * ``ssl_mode``: Activate/deactivate SSL/TLS, valid values `"no-ssl"`, `"start-tls"`, `"tls"` (default `"start-tls"`).
-  * ``check_hostname``: Whether to verify the hostname when using TLS (default `true`).
+  * ``ssl_mode``: Activate/deactivate SSL/TLS, valid values ``"no-ssl"``, ``"start-tls"``, ``"tls"`` (default ``"start-tls"``).
+  * ``check_hostname``: Whether to verify the hostname when using TLS (default ``true``).
 
 * ``template_vars``: Defines template variables to replace in the email templates.
 
@@ -92,7 +92,7 @@ The REST service runs as a Python `ASGI app
 
 
 CORS
-----
+~~~~
 
 To set appropriate CORS headers use the `FastAPI CORSMiddleware
 <https://fastapi.tiangolo.com/tutorial/cors/>`_. Activate it by adding the
@@ -120,7 +120,7 @@ requests, add the follwing lines to the file where you instantiate the app::
 
     app.add_middleware = ReCaptchaMiddleware('^/(un)?subscribe/.*', 'recaptcha.json')
 
-Also, create the ``recaptcha.json`` with the required ReCaptcha configuration::
+Also, create the ``recaptcha.json`` with the required ReCaptcha configuration:
 
 * ``hostnames``: List of hostnames to accept ReCaptchas from.
 * ``secret``: The shared key between your site and reCAPTCHA.

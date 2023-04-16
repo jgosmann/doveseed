@@ -35,6 +35,7 @@ Doveseed requires a configuration file in JSON format. Take a look at
 * ``smtp``
 
   * ``host``: SMTP host used to send notification emails.
+  * ``port``: SMTP port used to send notification emails (defaul: ``0`` = auto-select).
   * ``user``: SMTP logon user name.
   * ``password``: SMTP logon password.
   * ``ssl_mode``: Activate/deactivate SSL/TLS, valid values ``"no-ssl"``, ``"start-tls"``, ``"tls"`` (default ``"start-tls"``).

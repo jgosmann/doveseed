@@ -1,11 +1,13 @@
-import http
 from typing import Dict
+from httpx import Response
 
 import pytest
+from fastapi import status
+from fastapi.testclient import TestClient
 from tinydb import TinyDB, Query
 from tinydb.storages import MemoryStorage
 
-from doveseed.app import create_app_from_instances
+from doveseed.app import app, get_confirmation_requester, get_db
 from doveseed.domain_types import Email, Token, Action
 
 
@@ -19,8 +21,8 @@ class ConfirmationRequester:
         self.tokens[email] = confirm_token.to_string()
 
 
-def assert_success(response):
-    assert 200 <= response.status_code < 300, response.data
+def assert_success(response: Response):
+    assert 200 <= response.status_code < 300, response.read()
 
 
 @pytest.fixture
@@ -35,9 +37,13 @@ def db():
 
 @pytest.fixture
 def client(db, confirmation_requester):
-    app = create_app_from_instances(db, confirmation_requester)
-    with app.test_client() as client:
-        yield client
+    app.dependency_overrides[get_db] = lambda: db
+    app.dependency_overrides[
+        get_confirmation_requester
+    ] = lambda: confirmation_requester
+    yield TestClient(app)
+    del app.dependency_overrides[get_db]
+    del app.dependency_overrides[get_confirmation_requester]
 
 
 def test_subscription_and_unsubscription_flow(client, db, confirmation_requester):
@@ -83,10 +89,10 @@ def test_confirm_unauthorized(client, db, confirmation_requester):
             ("Authorization", "Bearer " + confirmation_requester.tokens[given_email])
         ],
     )
-    assert unknown_email_response.status_code == http.HTTPStatus.UNAUTHORIZED
+    assert unknown_email_response.status_code == status.HTTP_401_UNAUTHORIZED
 
     missing_auth_response = client.post(f"/confirm/{given_email}")
-    assert missing_auth_response.status_code == http.HTTPStatus.UNAUTHORIZED
+    assert missing_auth_response.status_code == status.HTTP_401_UNAUTHORIZED
 
     assert (
         client.post(
@@ -95,12 +101,12 @@ def test_confirm_unauthorized(client, db, confirmation_requester):
                 ("Authorization", "Basic " + confirmation_requester.tokens[given_email])
             ],
         )
-    ).status_code == http.HTTPStatus.UNAUTHORIZED
+    ).status_code == status.HTTP_401_UNAUTHORIZED
 
     known_email_response = client.post(
         f"/confirm/non-{given_email}",
         headers=[("Authorization", "Bearer invalid-token")],
     )
-    assert known_email_response.status_code == http.HTTPStatus.UNAUTHORIZED
+    assert known_email_response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    assert known_email_response.data == unknown_email_response.data
+    assert known_email_response.read() == unknown_email_response.read()

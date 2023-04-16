@@ -1,58 +1,55 @@
-import http
 import json
 import logging
 from typing import Optional
-import urllib.request
-from urllib.parse import urlencode
 import re
+import socket
 
-from werkzeug.wrappers import Request, Response
+import aiohttp
+from fastapi import Request, status
+from fastapi.responses import PlainTextResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 
 Logger = logging.getLogger(__name__)
 
 
-class ReCaptchaMiddleware:
+class ReCaptchaMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, paths, config_path):
-        self.app = app
+        super().__init__(app)
         self.paths = re.compile(paths)
         with open(config_path, encoding="utf-8") as f:
             config = json.load(f)
         self.valid_hostnames = config["hostnames"]
         self._secret = config["secret"]
 
-    def __call__(self, environ, start_response):
-        request = Request(environ)
-        if self.paths.match(request.path) and request.method == "POST":
-            data = request.get_json()
+    async def dispatch(self, request: Request, call_next):
+        if self.paths.match(request.url.path) and request.method == "POST":
+            data = await request.json()
             # pylint: disable=unsupported-membership-test,unsubscriptable-object
             if data is None or "captcha" not in data:
-                return self._to_response(
-                    environ,
-                    start_response,
-                    ("Missing captcha.", http.HTTPStatus.BAD_REQUEST),
+                return PlainTextResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST, content="Missing captcha."
                 )
-            if not self.verify_captcha(data["captcha"], request.remote_addr):
-                return self._to_response(
-                    environ,
-                    start_response,
-                    ("Invalid captcha.", http.HTTPStatus.UNAUTHORIZED),
+            if not await self.verify_captcha(
+                data["captcha"],
+                socket.gethostbyname(request.client.host) if request.client else None,
+            ):
+                return PlainTextResponse(
+                    status_code=status.HTTP_401_UNAUTHORIZED, content="Invalid captcha."
                 )
-        return self.app(environ, start_response)
+        return await call_next(request)
 
-    def verify_captcha(self, captcha: str, remote_ip: Optional[str]):
-        verification_request = urllib.request.Request(
-            "https://www.google.com/recaptcha/api/siteverify",
-            method="POST",
-            data=urlencode(
-                {"secret": self._secret, "response": captcha, "remoteip": remote_ip}
-            ).encode("ascii"),
-        )
-        with urllib.request.urlopen(verification_request) as f:
-            result = json.loads(f.read())
+    async def verify_captcha(self, captcha: str, remote_ip: Optional[str]):
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "https://www.google.com/recaptcha/api/siteverify",
+                data={
+                    "secret": self._secret,
+                    "response": captcha,
+                    "remoteip": remote_ip,
+                },
+            ) as response:
+                result = await response.json()
         if len(result.get("error-codes", [])) > 0:
             Logger.warning(result["error-codes"])
         return result["success"] and result["hostname"] in self.valid_hostnames
-
-    def _to_response(self, environ, start_response, response):
-        return Response(*response)(environ, start_response)

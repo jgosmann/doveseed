@@ -6,6 +6,23 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+[2.0.0] - 2023-04-16
+--------------------
+
+Changed
+^^^^^^^
+
+* Ported the code from Flask to FastAPI.
+* The ``app`` argument was removed from the ``ReCaptchaMiddleware``.
+
+Removed
+^^^^^^^
+
+* Support for Python 3.7, 3.8.
+* CORS configuration via the configuration JSON file. Use the `FastAPI
+  CORSMiddleware <https://fastapi.tiangolo.com/tutorial/cors/>`_ instead.
+
+
 [1.1.0] - 2023-04-11
 --------------------
 

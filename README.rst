@@ -30,17 +30,16 @@ Configuration
 Doveseed requires a configuration file in JSON format. Take a look at
 ``config.sample.json``. The format is as follows:
 
-* ``cors``: Maybe omitted to disable CORS headers. If given, will be passed to
-  ``CORS`` constructor of `flask-cors <https://flask-cors.readthedocs.io/en/latest/>`_.
 * ``db``: JSON file in which Doveseed persists its data.
 * ``rss``: URL to the RSS feed for which new notifications are to be send.
 * ``smtp``
 
   * ``host``: SMTP host used to send notification emails.
+  * ``port``: SMTP port used to send notification emails (defaul: ``0`` = auto-select).
   * ``user``: SMTP logon user name.
   * ``password``: SMTP logon password.
-  * ``ssl_mode``: Activate/deactivate SSL/TLS, valid values `"no-ssl"`, `"start-tls"`, `"tls"` (default `"start-tls"`).
-  * ``check_hostname``: Whether to verify the hostname when using TLS (default `true`).
+  * ``ssl_mode``: Activate/deactivate SSL/TLS, valid values ``"no-ssl"``, ``"start-tls"``, ``"tls"`` (default ``"start-tls"``).
+  * ``check_hostname``: Whether to verify the hostname when using TLS (default ``true``).
 
 * ``template_vars``: Defines template variables to replace in the email templates.
 
@@ -87,44 +86,48 @@ Each of these templates consists out of three files:
 REST service
 ^^^^^^^^^^^^
 
-The REST service runs as a Python WSGI app. Any WSGI app server could be used.
+The REST service runs as a Python `ASGI app
+<https://asgi.readthedocs.io/en/latest/>`_. See the FastAPI documentation for
+`deployment options <https://fastapi.tiangolo.com/deployment/>`_.
 
-Passenger
-~~~~~~~~~
-
-Sample ``passenger_wsgi.py`` file::
-
-    import logging
-    logging.basicConfig(filename="/path/to/log", level=logging.WARN)
-
-    from doveseed.app import create_app
-    application = create_app()
 
 
 CORS
 ~~~~
 
-To set appropriate CORS headers use the
-`flask-cors <https://flask-cors.readthedocs.io/en/latest/>`_ package.
-Activate it by adding the following lines to the file where you instantiate
-the app, for example your ``passenger_wsgi.py`` file::
+To set appropriate CORS headers use the `FastAPI CORSMiddleware
+<https://fastapi.tiangolo.com/tutorial/cors/>`_. Activate it by adding the
+following lines to the file where you instantiate the app::
 
-    from flask_cors import CORS
-    CORS(application, origins=["https://my-domain.tld"])
+    from doveseed.app import app
+    from fastapi.middleware.cors import CORSMiddleware
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://example.com"],
+        allow_methods=["GET", "POST"],
+        allow_headers=["Authorization"],
+    )
 
 
 ReCaptcha
 ~~~~~~~~~
 
-To activate `ReCaptcha (v2) <https://www.google.com/recaptcha/>`_ verification of
-requests, add the follwing lines to the file where you instantiate the app,
-for example your ``passenger_wsgi.py`` file::
+You activate `ReCaptcha (v2) <https://www.google.com/recaptcha/>`_ verification of
+requests with Doveseed.
 
+First, you need to install the required optional dependencies::
+
+    pip install 'doveseed[recaptcha]'
+
+Then, add the follwing lines to the file where you instantiate the app::
+
+    from doveseed.app import app
     from doveseed.recaptcha import ReCaptchaMiddleware
-    application.wsgi_app = ReCaptchaMiddleware(
-        application.wsgi_app, '^/(un)?subscribe/.*', 'recaptcha.json')
 
-Also, create the ``recaptcha.json`` with the required ReCaptcha configuration::
+    app.add_middleware = ReCaptchaMiddleware('^/(un)?subscribe/.*', 'recaptcha.json')
+
+Also, create the ``recaptcha.json`` with the required ReCaptcha configuration:
 
 * ``hostnames``: List of hostnames to accept ReCaptchas from.
 * ``secret``: The shared key between your site and reCAPTCHA.

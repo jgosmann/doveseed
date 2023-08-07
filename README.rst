@@ -1,7 +1,7 @@
 .. image:: https://github.com/jgosmann/doveseed/actions/workflows/ci.yml/badge.svg
   :target: https://github.com/jgosmann/doveseed/actions/workflows/ci.yml
   :alt: CI and release pipeline
-.. image:: https://codecov.io/gh/jgosmann/doveseed/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/jgosmann/doveseed/branch/main/graph/badge.svg
   :target: https://codecov.io/gh/jgosmann/doveseed
   :alt: Codecov coverage
 .. image:: https://img.shields.io/pypi/v/doveseed

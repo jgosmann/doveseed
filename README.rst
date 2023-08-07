@@ -14,6 +14,9 @@
   :target: https://pypi.org/project/doveseed/
   :alt: PyPI - License
 
+.. image:: https://github.com/jgosmann/doveseed/blob/main/doveseed-logo.png
+  :alt: Doveseed logo
+
 
 Doveseed
 ========

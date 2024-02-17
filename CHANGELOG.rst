@@ -13,6 +13,8 @@ Added
 ^^^^^
 
 * Officially declare Python 3.12 support.
+* Tag Docker image of latest stable version with ``latest`` tag.
+* Publish Docker image for ``linux/amd64`` and ``linux/arm64`` platforms.
 
 Security
 ^^^^^^^^

@@ -9,8 +9,7 @@ from .domain_types import Email, Token, Action
 class EmailMessageProvider(Protocol):
     def get_confirmation_request_msg(
         self, to_email: Email, *, action: Action, confirm_token: Token
-    ) -> EmailMessage:
-        ...
+    ) -> EmailMessage: ...
 
 
 class EmailConfirmationRequester:

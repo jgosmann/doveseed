@@ -9,13 +9,13 @@ from .smtp import ConnectionManager
 
 
 class Storage(Protocol):
-    def get_all_active_subscribers(self) -> Iterable[Registration]:
-        ...
+    def get_all_active_subscribers(self) -> Iterable[Registration]: ...
 
 
 class EmailMessageProvider(Protocol):
-    def get_new_post_msg(self, feed_item: FeedItem, to_email: Email) -> EmailMessage:
-        ...
+    def get_new_post_msg(
+        self, feed_item: FeedItem, to_email: Email
+    ) -> EmailMessage: ...
 
 
 class EmailNotifier:

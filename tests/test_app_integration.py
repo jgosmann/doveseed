@@ -38,9 +38,9 @@ def db():
 @pytest.fixture
 def client(db, confirmation_requester):
     app.dependency_overrides[get_db] = lambda: db
-    app.dependency_overrides[
-        get_confirmation_requester
-    ] = lambda: confirmation_requester
+    app.dependency_overrides[get_confirmation_requester] = (
+        lambda: confirmation_requester
+    )
     yield TestClient(app)
     del app.dependency_overrides[get_db]
     del app.dependency_overrides[get_confirmation_requester]

@@ -8,9 +8,9 @@ class SmtpConfig:
     user: str
     password: str
     port: int = 0
-    ssl_mode: Union[
-        Literal["no-ssl"], Literal["start-tls"], Literal["tls"]
-    ] = "start-tls"
+    ssl_mode: Union[Literal["no-ssl"], Literal["start-tls"], Literal["tls"]] = (
+        "start-tls"
+    )
     check_hostname: bool = True
 
 

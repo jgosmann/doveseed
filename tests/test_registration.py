@@ -353,9 +353,11 @@ class TestRegistrationServiceConfirm:
                 state=state,
                 last_update=utcnow() - timedelta(days=1),
                 confirm_token=Token(b"actual token"),
-                confirm_action=Action.subscribe
-                if state == State.pending_subscribe
-                else Action.unsubscribe,
+                confirm_action=(
+                    Action.subscribe
+                    if state == State.pending_subscribe
+                    else Action.unsubscribe
+                ),
             )
         )
 

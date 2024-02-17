@@ -7,7 +7,7 @@ from typing import Annotated, Literal, Optional, Union
 from fastapi import Depends, FastAPI, Header, Path, Request, status
 from fastapi.responses import PlainTextResponse
 from jinja2 import FileSystemLoader
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from tinydb import TinyDB
 
 from doveseed import __version__

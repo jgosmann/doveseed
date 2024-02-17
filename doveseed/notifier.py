@@ -7,16 +7,13 @@ from .domain_types import FeedItem
 
 
 class Storage(Protocol):
-    def get_last_seen(self) -> Optional[datetime]:
-        ...
+    def get_last_seen(self) -> Optional[datetime]: ...
 
-    def set_last_seen(self, value: datetime) -> None:
-        ...
+    def set_last_seen(self, value: datetime) -> None: ...
 
 
 class Consumer(Protocol):
-    def __call__(self, feed_item: FeedItem) -> None:
-        ...
+    def __call__(self, feed_item: FeedItem) -> None: ...
 
 
 Feed = Iterable[FeedItem]

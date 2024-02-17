@@ -24,7 +24,8 @@ on:
         required: true
 
 env:
-  IMAGE_NAME: jgosmann/dmarc-metrics-exporter
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
 
 
 jobs:
@@ -75,7 +76,7 @@ jobs:
         id: latest-version
         uses: ./.github/actions/get-latest-release
         with:
-          package: dmarc-metrics-exporter
+          package: doveseed
 
       - name: Set tags
         id: set-tags

@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+[2.0.4] - 2024-05-26
+--------------------
+
+Security
+^^^^^^^^
+
+* Update dependencies to mitigate vulnerabilities:
+  - `CVE-2024-30251 <https://nvd.nist.gov/vuln/detail/CVE-2024-30251>`_ (denial of service)
+  - `CVE-2024-34064 <https://nvd.nist.gov/vuln/detail/CVE-2024-34064>`_ (Jinja HTML attribute injection, doveseed likely no affected)
+
+
 [2.0.3] - 2024-02-17
 --------------------
 

@@ -31,7 +31,7 @@ all = ["aiohttp", "starlette"]
 recaptcha = ["aiohttp", "starlette"]
 
 [tool.poetry.group.dev.dependencies]
-black = "24.2.0"
+black = "24.3.0"
 httpx = "^0.26.0"
 mypy = "^1.8.0"
 pylint = "^3.0.3"

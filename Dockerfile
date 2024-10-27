@@ -2,7 +2,7 @@ FROM python:3.11-slim AS builder
 ARG version
 
 RUN python3 -m venv venv && \
-    venv/bin/pip3 --disable-pip-version-check install gunicorn==22.0.0 uvicorn==0.29.0 'doveseed[all]'==${version}
+    venv/bin/pip3 --disable-pip-version-check install gunicorn==23.0.0 uvicorn==0.32.0 'doveseed[all]'==${version}
 
 FROM python:3.11-alpine AS runner
 

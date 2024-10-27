@@ -75,6 +75,7 @@ disable=raw-checker-failed,
         redefined-outer-name,
         unused-argument,
         too-many-arguments,
+        too-many-positional-arguments,
         duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can

@@ -4,7 +4,7 @@ from dataclasses import asdict, fields, is_dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from inspect import isclass
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, cast, Dict, Optional, Type, Union
 
 from tinydb import TinyDB, Query
 
@@ -50,10 +50,13 @@ class TinyDbStorage:
                 continue
 
             type_info = field.type
-            if getattr(type_info, "__origin__", None) is Union:
+            if getattr(type_info, "__origin__", None) is Union and hasattr(
+                type_info, "__args__"
+            ):
                 type_info = next(x for x in type_info.__args__ if x is not type(None))
 
             if type_info is bytes:
+                type_info = cast(type[bytes], type_info)
                 data[field.name] = type_info(
                     b64decode(data[field.name].encode("ascii"))
                 )
@@ -61,7 +64,7 @@ class TinyDbStorage:
                 data[field.name] = datetime.fromisoformat(data[field.name])
             elif isclass(type_info) and issubclass(type_info, Enum):
                 data[field.name] = type_info[data[field.name]]
-            elif is_dataclass(type_info):
+            elif is_dataclass(type_info) and isinstance(type_info, type):
                 self._deserialize_in_place(type_info, data[field.name])
                 data[field.name] = type_info(**data[field.name])
 

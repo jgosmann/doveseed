@@ -6,7 +6,6 @@ import pytest
 from doveseed.domain_types import FeedItem
 from doveseed.feed import parse_rss
 
-
 sample_rss_feeds = [
     (
         ElementTree.fromstring(

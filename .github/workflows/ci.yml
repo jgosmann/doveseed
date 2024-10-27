@@ -13,9 +13,9 @@ jobs:
       matrix:
         check:
           - name: Check code-formatting
-            run: poetry run black --check .
-          - name: pylint
-            run: poetry run pylint doveseed mail_tests tests
+            run: poetry run ruff format --check .
+          - name: Lint
+            run: poetry run ruff check
           - name: Check static typing
             run: poetry run mypy doveseed mail_tests tests
     steps:

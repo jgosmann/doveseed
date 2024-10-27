@@ -5,7 +5,7 @@ from typing import Callable, Iterator, Optional
 
 from typing_extensions import Protocol
 
-from .domain_types import Email, Token, State, Action
+from .domain_types import Action, Email, State, Token
 
 
 @dataclass
@@ -38,7 +38,7 @@ class RegistrationService:
         storage: Storage,
         confirmation_requester: ConfirmationRequester,
         token_generator: Iterator[Token],
-        utcnow: Callable[[], datetime]
+        utcnow: Callable[[], datetime],
     ):
         self._storage = storage
         self._confirmation_requester = confirmation_requester

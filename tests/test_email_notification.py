@@ -1,10 +1,10 @@
-from email.message import EmailMessage
 from datetime import datetime
-from unittest.mock import call, MagicMock
+from email.message import EmailMessage
+from unittest.mock import MagicMock, call
 
 from doveseed.domain_types import Email, FeedItem, State
-from doveseed.registration import Registration
 from doveseed.email_notification import EmailNotifier
+from doveseed.registration import Registration
 
 
 def test_email_notifier():

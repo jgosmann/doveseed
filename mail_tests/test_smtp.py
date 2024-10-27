@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
-from email.message import EmailMessage
 import getpass
 import sys
+from email.message import EmailMessage
 
 from doveseed.smtp import SslMode, smtp_connection
-
 
 parser = argparse.ArgumentParser(
     description="Test the smtp module by sending a test email."

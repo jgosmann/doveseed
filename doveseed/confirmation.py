@@ -2,8 +2,8 @@ from email.message import EmailMessage
 
 from typing_extensions import Protocol
 
+from .domain_types import Action, Email, Token
 from .smtp import ConnectionManager
-from .domain_types import Email, Token, Action
 
 
 class EmailMessageProvider(Protocol):

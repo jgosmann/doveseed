@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
 import pytest
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 from tinydb.storages import MemoryStorage
 
-from doveseed.domain_types import Email, Token, State, Action
+from doveseed.domain_types import Action, Email, State, Token
 from doveseed.registration import Registration
 from doveseed.storage import TinyDbStorage
 

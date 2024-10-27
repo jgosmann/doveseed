@@ -1,7 +1,7 @@
-from dataclasses import asdict
 import datetime
-from functools import cache
 import json
+from dataclasses import asdict
+from functools import cache
 from typing import Annotated, Literal, Optional, Union
 
 from fastapi import Depends, FastAPI, Header, Path, Request, status
@@ -14,6 +14,7 @@ from doveseed import __version__
 from doveseed.config import Config, SmtpConfig, TemplateVarsConfig
 
 from .confirmation import EmailConfirmationRequester
+from .domain_types import Email, Token
 from .email_templating import EmailFromTemplateProvider, FileSystemBinaryLoader
 from .registration import (
     ConfirmationRequester,
@@ -23,7 +24,6 @@ from .registration import (
 from .smtp import ConnectionManager, noop_connection, smtp_connection
 from .storage import TinyDbStorage
 from .token_gen import gen_secure_token
-from .domain_types import Email, Token
 
 
 class Settings(BaseSettings):
@@ -102,7 +102,7 @@ def require_bearer_token(
             description="Header providing credentials to authorize the requested operation.",
             example="Bearer 6RQkYl6o8aWzPe5IfGuZBA==",
         ),
-    ] = None
+    ] = None,
 ) -> Token:
     if authorization is None:
         raise UnauthorizedException("Improper Authorization header.")

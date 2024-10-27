@@ -1,5 +1,6 @@
-from doveseed.app import app
 from fastapi.middleware.cors import CORSMiddleware
+
+from doveseed.app import app
 
 app.add_middleware(
     CORSMiddleware,

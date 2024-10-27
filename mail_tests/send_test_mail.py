@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 import argparse
-from datetime import datetime
 import getpass
+from datetime import datetime
 
 from jinja2 import FileSystemLoader
 
-from doveseed.smtp import SslMode, smtp_connection
+from doveseed.domain_types import Action, FeedItem, Token
 from doveseed.email_templating import EmailFromTemplateProvider, FileSystemBinaryLoader
-from doveseed.domain_types import FeedItem, Token, Action
+from doveseed.smtp import SslMode, smtp_connection
 
 LoremIpsum = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. In
 dictum commodo odio, sed blandit dui convallis eget. Donec quis ipsum urna.

@@ -2,7 +2,7 @@ from email.message import EmailMessage
 from unittest.mock import MagicMock
 
 from doveseed.confirmation import EmailConfirmationRequester
-from doveseed.domain_types import Email, Token, Action
+from doveseed.domain_types import Action, Email, Token
 
 
 def test_email_confirmation_requester():

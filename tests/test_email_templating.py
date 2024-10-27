@@ -3,11 +3,11 @@ from datetime import datetime
 from typing import Dict
 from urllib.parse import quote
 
-from jinja2 import BaseLoader
 import pytest
+from jinja2 import BaseLoader
 
-from doveseed.email_templating import EmailFromTemplateProvider
 from doveseed.domain_types import Action, Email, FeedItem, Token
+from doveseed.email_templating import EmailFromTemplateProvider
 
 
 class MockTemplateLoader(BaseLoader):

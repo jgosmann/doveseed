@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock
 from typing import Dict, List, Optional
+from unittest.mock import MagicMock
 
 import pytest
 
+from doveseed.domain_types import Action, Email, State, Token
 from doveseed.registration import (
     Registration,
     RegistrationService,
     UnauthorizedException,
 )
-from doveseed.domain_types import Email, Token, State, Action
 
 
 class InMemoryStorage:

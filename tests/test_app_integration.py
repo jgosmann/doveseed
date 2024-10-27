@@ -1,14 +1,14 @@
 from typing import Dict
-from httpx import Response
 
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from tinydb import TinyDB, Query
+from httpx import Response
+from tinydb import Query, TinyDB
 from tinydb.storages import MemoryStorage
 
 from doveseed.app import app, get_confirmation_requester, get_db
-from doveseed.domain_types import Email, Token, Action
+from doveseed.domain_types import Action, Email, Token
 
 
 class ConfirmationRequester:

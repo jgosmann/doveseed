@@ -1,8 +1,8 @@
+import ssl
 from contextlib import contextmanager
 from email.message import EmailMessage
 from enum import Enum
 from smtplib import SMTP, SMTP_SSL
-import ssl
 from typing import Callable, ContextManager, Generator
 
 
@@ -52,7 +52,7 @@ def smtp_connection(
     password: str,
     port: int = 0,
     ssl_mode: str = SslMode.START_TLS.value,
-    check_hostname: bool = True
+    check_hostname: bool = True,
 ) -> ConnectionManager:
     _ssl_mode = SslMode.from_str(ssl_mode)
     context = None

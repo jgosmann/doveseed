@@ -5,7 +5,6 @@ import pytest
 
 from doveseed.notifier import FeedItem, NewPostNotifier
 
-
 ReferenceDatetime = datetime(2019, 11, 22, tzinfo=timezone.utc)
 
 OldFeedItem = FeedItem(

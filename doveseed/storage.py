@@ -4,9 +4,9 @@ from dataclasses import asdict, fields, is_dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from inspect import isclass
-from typing import Any, cast, Dict, Optional, Type, Union
+from typing import Any, Dict, Optional, Type, Union, cast
 
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 from .domain_types import Email, State
 from .registration import Registration

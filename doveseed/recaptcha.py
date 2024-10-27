@@ -1,14 +1,13 @@
 import json
 import logging
-from typing import Optional
 import re
 import socket
+from typing import Optional
 
 import aiohttp
 from fastapi import Request, status
 from fastapi.responses import PlainTextResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-
 
 Logger = logging.getLogger(__name__)
 

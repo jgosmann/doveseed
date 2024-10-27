@@ -1,10 +1,10 @@
-FROM python:3.11-slim AS builder
+FROM python:3.13-slim AS builder
 ARG version
 
 RUN python3 -m venv venv && \
     venv/bin/pip3 --disable-pip-version-check install gunicorn==23.0.0 uvicorn==0.32.0 'doveseed[all]'==${version}
 
-FROM python:3.11-alpine AS runner
+FROM python:3.13-alpine AS runner
 
 ENV DOVESEED_APP=doveseed.app:app
 

@@ -1,7 +1,9 @@
+import mimetypes
 import os.path
 from base64 import b64encode
 from dataclasses import dataclass
-from email.message import EmailMessage
+from email.message import EmailMessage, Message, MIMEPart
+from typing import List, Mapping, Optional, Tuple, cast
 from urllib.parse import quote
 
 from jinja2 import Environment
@@ -28,6 +30,7 @@ class EmailFromTemplateProvider:
 
     def __init__(self, *, settings: Settings, template_loader, binary_loader):
         self.settings = settings
+        self._binary_loader = binary_loader
         self._env = Environment(loader=template_loader)
         self._env.filters["b64encode"] = lambda x: b64encode(x).decode("ascii")
         self._env.filters["urlquote"] = quote
@@ -51,24 +54,7 @@ class EmailFromTemplateProvider:
             "to_email": to_email,
         }
 
-        subject = self._env.get_template(f"{action.name}.subject.txt").render(
-            **substitutions
-        )
-        substitutions["subject"] = subject
-
-        plain_text = self._env.get_template(f"{action.name}.txt").render(
-            **substitutions
-        )
-        html = self._env.get_template(f"{action.name}.html").render(**substitutions)
-
-        msg = EmailMessage()
-        msg.set_content(plain_text)
-        msg.add_alternative(html, subtype="html")
-        msg["Subject"] = subject
-        msg["From"] = self.settings.sender
-        msg["To"] = to_email
-
-        return msg
+        return self._msg_from_template(action.name, to_email, substitutions)
 
     def get_new_post_msg(self, feed_item: FeedItem, to_email: Email) -> EmailMessage:
         substitutions = dict(
@@ -80,17 +66,108 @@ class EmailFromTemplateProvider:
             }
         )
 
-        subject = self._env.get_template("new-post.subject.txt").render(**substitutions)
+        return self._msg_from_template("new-post", to_email, substitutions)
+
+    def _msg_from_template(
+        self, template: str, to_email: str, substitutions: Mapping[str, object]
+    ) -> EmailMessage:
+        substitutions = dict(substitutions)
+        subject = self._env.get_template(f"{template}.subject.txt").render(
+            **substitutions
+        )
         substitutions["subject"] = subject
 
-        plain_text = self._env.get_template("new-post.txt").render(**substitutions)
-        html = self._env.get_template("new-post.html").render(**substitutions)
+        plain_text_related_collector = _RelatedPartsCollector(
+            "inline-txt-", self._binary_loader
+        )
+        plain_text = (
+            plain_text_related_collector.overlay_env(self._env)
+            .get_template(f"{template}.txt")
+            .render(**substitutions)
+        )
+        html_related_collector = _RelatedPartsCollector(
+            "inline-html-", self._binary_loader
+        )
+        html = (
+            html_related_collector.overlay_env(self._env)
+            .get_template(f"{template}.html")
+            .render(**substitutions)
+        )
 
         msg = EmailMessage()
         msg.set_content(plain_text)
         msg.add_alternative(html, subtype="html")
+        plain_text_related_collector.assemble(msg.get_body(("plain",)))
+        html_related_collector.assemble(msg.get_body(("html",)))
         msg["Subject"] = subject
         msg["From"] = self.settings.sender
         msg["To"] = to_email
 
         return msg
+
+
+@dataclass(frozen=True)
+class RelatedPartInfo:
+    content_id: str
+    filename: str
+    content_type: Tuple[str, str]
+    path: str
+
+
+class _RelatedPartsCollector:
+    def __init__(self, id_prefix: str, binary_loader):
+        self.id_prefix = id_prefix
+        self.next_id = 0
+        self.parts: List[RelatedPartInfo] = []
+        self.binary_loader = binary_loader
+
+    def overlay_env(self, env: Environment):
+        overlay_env = env.overlay()
+        overlay_env.globals["include_related"] = self.include_related
+        return overlay_env
+
+    def include_related(
+        self,
+        path: str,
+        *,
+        filename: Optional[str] = None,
+        content_type: Optional[Tuple[str, str]] = None,
+    ) -> RelatedPartInfo:
+        content_id = f"{self.id_prefix}{self.next_id}"
+        self.next_id += 1
+
+        if filename is None:
+            filename = os.path.basename(path)
+
+        if content_type is None:
+            raw_content_type, _ = mimetypes.guess_type(path)
+            content_type = cast(
+                Tuple[str, str],
+                tuple(
+                    (raw_content_type or "application/octet-stream").split(
+                        "/", maxsplit=1
+                    )
+                ),
+            )
+
+        part_info = RelatedPartInfo(
+            content_id=content_id,
+            filename=filename,
+            content_type=content_type,
+            path=path,
+        )
+        self.parts.append(part_info)
+        return part_info
+
+    def assemble(self, body: Optional[Message]) -> None:
+        if not isinstance(body, MIMEPart):
+            return
+        for part in self.parts:
+            body.add_related(
+                self.binary_loader.load(part.path),
+                maintype=part.content_type[0],
+                subtype=part.content_type[1],
+                cid=part.content_id,
+                filename=part.filename,
+                disposition="inline",
+            )

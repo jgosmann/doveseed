@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_,
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+[2.1.0] - unreleased
+--------------------
+
+Added
+^^^^^
+
+* ``include_related`` function within templates that allows for the inclusion
+  of files (e.g. images) into the email for inline usage/reference via content
+  ID. This can be used to include inline images.
+
+
 [2.0.5] - 2024-10-27
 --------------------
 

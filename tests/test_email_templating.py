@@ -1,4 +1,4 @@
-from base64 import b64encode
+from base64 import b64decode, b64encode
 from datetime import datetime
 from typing import Dict
 from urllib.parse import quote
@@ -7,7 +7,11 @@ import pytest
 from jinja2 import BaseLoader
 
 from doveseed.domain_types import Action, Email, FeedItem, Token
-from doveseed.email_templating import EmailFromTemplateProvider
+from doveseed.email_templating import (
+    EmailFromTemplateProvider,
+    RelatedPartInfo,
+    _RelatedPartsCollector,
+)
 
 
 class MockTemplateLoader(BaseLoader):
@@ -268,3 +272,111 @@ class TestGetNewPostMsg:
         msg = provider.get_new_post_msg(feed_item, Email("email"))
 
         assert msg["Subject"] == b64encode(binary_content).decode("ascii")
+
+    def test_include_related_plain_text(self, feed_item, settings):
+        binary_content = b"binary content"
+        provider = EmailFromTemplateProvider(
+            settings=settings,
+            template_loader=MockTemplateLoader(
+                {
+                    "new-post.subject.txt": "Include attachment",
+                    "new-post.txt": "{{ include_related('bin').content_id }}",
+                    "new-post.html": "",
+                }
+            ),
+            binary_loader=MockBinaryLoader({"bin": binary_content}),
+        )
+        msg = provider.get_new_post_msg(feed_item, Email("email"))
+
+        body = msg.get_body(("plain",))
+        assert body
+        payload = body.get_payload()
+        assert payload
+        content_id = str(payload).strip()
+
+        assert [
+            b64decode(str(part.get_payload() or ""))
+            for part in msg.walk()
+            if part.get("Content-ID", None) == content_id
+        ] == [binary_content]
+
+    def test_include_related_html(self, feed_item, settings):
+        binary_content = b"binary content"
+        provider = EmailFromTemplateProvider(
+            settings=settings,
+            template_loader=MockTemplateLoader(
+                {
+                    "new-post.subject.txt": "Include attachment",
+                    "new-post.txt": "",
+                    "new-post.html": "{{ include_related('bin').content_id }}",
+                }
+            ),
+            binary_loader=MockBinaryLoader({"bin": binary_content}),
+        )
+        msg = provider.get_new_post_msg(feed_item, Email("email"))
+
+        body = msg.get_body(("html",))
+        assert body
+        payload = body.get_payload()
+        assert payload
+        content_id = str(payload).strip()
+
+        assert [
+            b64decode(str(part.get_payload() or ""))
+            for part in msg.walk()
+            if part.get("Content-ID", None) == content_id
+        ] == [binary_content]
+
+
+@pytest.mark.parametrize(
+    "args,kwargs,expected",
+    [
+        (
+            ("foo/bar/somefile.bin",),
+            {},
+            RelatedPartInfo(
+                content_id="some-id",
+                filename="somefile.bin",
+                content_type=("application", "octet-stream"),
+                path="foo/bar/somefile.bin",
+            ),
+        ),
+        (
+            ("image.jpg",),
+            {},
+            RelatedPartInfo(
+                content_id="some-id",
+                filename="image.jpg",
+                content_type=("image", "jpeg"),
+                path="image.jpg",
+            ),
+        ),
+        (
+            ("image.png",),
+            {},
+            RelatedPartInfo(
+                content_id="some-id",
+                filename="image.png",
+                content_type=("image", "png"),
+                path="image.png",
+            ),
+        ),
+        (
+            ("image.jpg",),
+            {"filename": "foo.xyz", "content_type": ("application", "foo")},
+            RelatedPartInfo(
+                content_id="some-id",
+                filename="foo.xyz",
+                content_type=("application", "foo"),
+                path="image.jpg",
+            ),
+        ),
+    ],
+)
+def test_include_related(args, kwargs, expected):
+    info = _RelatedPartsCollector("prefix", MockBinaryLoader({})).include_related(
+        *args, **kwargs
+    )
+    assert info.filename == expected.filename
+    assert info.content_type == expected.content_type
+    assert info.path == expected.path

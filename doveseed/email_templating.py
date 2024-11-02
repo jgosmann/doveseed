@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from email.message import EmailMessage, Message, MIMEPart
 from typing import List, Mapping, Optional, Tuple, cast
 from urllib.parse import quote
+from uuid import uuid1
 
 from jinja2 import Environment
 
@@ -77,17 +78,13 @@ class EmailFromTemplateProvider:
         )
         substitutions["subject"] = subject
 
-        plain_text_related_collector = _RelatedPartsCollector(
-            "inline-txt-", self._binary_loader
-        )
+        plain_text_related_collector = _RelatedPartsCollector(self._binary_loader)
         plain_text = (
             plain_text_related_collector.overlay_env(self._env)
             .get_template(f"{template}.txt")
             .render(**substitutions)
         )
-        html_related_collector = _RelatedPartsCollector(
-            "inline-html-", self._binary_loader
-        )
+        html_related_collector = _RelatedPartsCollector(self._binary_loader)
         html = (
             html_related_collector.overlay_env(self._env)
             .get_template(f"{template}.html")
@@ -115,9 +112,7 @@ class RelatedPartInfo:
 
 
 class _RelatedPartsCollector:
-    def __init__(self, id_prefix: str, binary_loader):
-        self.id_prefix = id_prefix
-        self.next_id = 0
+    def __init__(self, binary_loader):
         self.parts: List[RelatedPartInfo] = []
         self.binary_loader = binary_loader
 
@@ -133,8 +128,7 @@ class _RelatedPartsCollector:
         filename: Optional[str] = None,
         content_type: Optional[Tuple[str, str]] = None,
     ) -> RelatedPartInfo:
-        content_id = f"{self.id_prefix}{self.next_id}"
-        self.next_id += 1
+        content_id = str(uuid1())
 
         if filename is None:
             filename = os.path.basename(path)

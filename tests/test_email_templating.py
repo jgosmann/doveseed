@@ -374,9 +374,7 @@ class TestGetNewPostMsg:
     ],
 )
 def test_include_related(args, kwargs, expected):
-    info = _RelatedPartsCollector("prefix", MockBinaryLoader({})).include_related(
-        *args, **kwargs
-    )
+    info = _RelatedPartsCollector(MockBinaryLoader({})).include_related(*args, **kwargs)
     assert info.filename == expected.filename
     assert info.content_type == expected.content_type
     assert info.path == expected.path

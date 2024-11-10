@@ -160,7 +160,7 @@ class _RelatedPartsCollector:
             body.add_related(
                 self.binary_loader.load(part.path),
                 maintype=part.content_type[0],
-                subtype=part.content_type[1],
+                subtype=f"<{part.content_type[1]}>",
                 cid=part.content_id,
                 filename=part.filename,
                 disposition="inline",

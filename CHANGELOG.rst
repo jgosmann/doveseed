@@ -9,6 +9,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 [2.1.2] - 2024-11-10
 --------------------
 
+Fixed
+^^^^^
+
 * Enclose content ID within angle brackets in header for better compatibility
   with different email clients.
 

@@ -100,7 +100,7 @@ def require_bearer_token(
         Optional[str],
         Header(
             description="Header providing credentials to authorize the requested operation.",
-            example="Bearer 6RQkYl6o8aWzPe5IfGuZBA==",
+            examples=["Bearer 6RQkYl6o8aWzPe5IfGuZBA=="],
         ),
     ] = None,
 ) -> Token:
@@ -138,7 +138,9 @@ async def health():
 def subscribe(
     email: Annotated[
         str,
-        Path(description="Email address to subscribe.", example="john.doe@example.com"),
+        Path(
+            description="Email address to subscribe.", examples=["john.doe@example.com"]
+        ),
     ],
     registration_service: Annotated[
         RegistrationService, Depends(get_registration_service)
@@ -157,7 +159,8 @@ def unsubscribe(
     email: Annotated[
         str,
         Path(
-            description="Email address to unsubscribe.", example="john.doe@example.com"
+            description="Email address to unsubscribe.",
+            examples=["john.doe@example.com"],
         ),
     ],
     registration_service: Annotated[
@@ -179,7 +182,7 @@ def confirm(
         str,
         Path(
             description="Email address to confirm subscribing or unsubscribing for.",
-            example="john.doe@example.com",
+            examples=["john.doe@example.com"],
         ),
     ],
     registration_service: Annotated[

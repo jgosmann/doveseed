@@ -12,7 +12,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Security
 ^^^^^^^^
 
-* Update `aiohttp` to mitigate CVE-2024-52304.
+* Update ``aiohttp`` to mitigate CVE-2024-52304.
 
 
 [2.1.2] - 2024-11-10

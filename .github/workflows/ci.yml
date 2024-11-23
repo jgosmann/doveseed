@@ -114,7 +114,7 @@ jobs:
 
       - uses: docker://pandoc/core:3
         with:
-          args: --standalone --wrap none -f rst -t gfm --output=release-body.md release-body.rst
+          args: --wrap none -f rst -t gfm --output=release-body.md release-body.rst
 
       - name: Check if prerelease
         id: check-prerelease
